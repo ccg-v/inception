@@ -9,7 +9,11 @@
 
 ## Running a container
 
-`docker pull busybox` \\ We pull an image of busybox [^1]
-`docker run -it busybox sh`
+BusyBox is a tiny Linux distro that packages many common Unix utilities (`ls`, `sh`, `cat`, ...) into a single binary, resulting in a very small image (usually less than 1 Mb.)
+First we are going to pull busybox image from Docker hub:
+	`docker pull busybox`
+Next we run a busybox container folowed by a command:
+	`docker run busybox ls`
 
-[^1]: BusyBox is a tiny Linux distro that packages many common Unix utilities (`ls`, `sh`, `cat`, ...) into a single binary, resulting in a very small image (usually less than 1 Mb.)
+	
+ 
