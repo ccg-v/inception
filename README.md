@@ -9,6 +9,8 @@
 - docker **`ps -a`**		: Shows all the containers that we have ran but are currently inactive
 - docker <command> `--help`	: Displays help (basically available options) about provided command
 
+---------------------------
+
 ## Running a container
 
 BusyBox is a tiny Linux distro that packages many common Unix utilities (`ls`, `sh`, `cat`, ...) into a single binary, resulting in a very small image (usually less than 1 Mb.)
@@ -54,6 +56,7 @@ The command is executed within the container, and the process stops. If we want 
 
 To finish shell session, use the <ins>**`exit`**</ins> command.
 
+---------------------------
 
 ## Container isolation. Restarting/executing containers.
 
@@ -90,6 +93,7 @@ This command can also be used as a third way to start an interactive session wit
    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker start 116268d6f047`\
    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker exec -it 116268d6f047 sh`
 
+---------------------------
 
 ## Deleting containers
 
@@ -131,6 +135,7 @@ Now we can run a container based on our newly created _<my_image_name>_ image:
 
    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker container run my_image_name figlet hello!`
 
+---------------------------
 
 ## Creating our images using a Dockerfile
 
