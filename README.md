@@ -117,9 +117,9 @@ apt-get install -y figlet
 figlet "Hello!"
 ```
 
-Our container installs the 'figlet' package and runs it, displaying 'Hello' in an ASCII-art way. If we want to share our new application, we must **`commit`** our changes:
+Our container installs the _figlet_ package and runs it, displaying 'Hello' in an ASCII-art way. If we want to share our new application, we must **`commit`** our changes:
 
-   ```docker container commit <container_ID>```
+```docker container commit <container_ID>```
 
 We can also **`tag`** it so that it is easier to identify when we display a list of our system `images`:
 
