@@ -1,11 +1,13 @@
 # Docker
 
 ## Basic commands
-- docker `pull` <image>	: Fetches the given image from the Docker registry
-- docker `images`		: Lists all images fetched to our system
-- docker `run` <image>	: Runs a Docker container based on the provided image
-- docker `ps`			: Shows all the containers that we have currently running
-- docker `ps -a`		: Shows all the containers that we have ran but are currently inactive
+
+- docker `pull` <image>		: Fetches the given image from the Docker registry
+- docker `images`			: Lists all images fetched to our system
+- docker `run` <image>		: Runs a Docker container based on the provided image
+- docker `ps`				: Shows all the containers that we have currently running
+- docker `ps -a`			: Shows all the containers that we have ran but are currently inactive
+- docker <command> `--help`	: Displays help (basically available options) about provided command
 
 ## Running a container
 
@@ -19,7 +21,7 @@ Next we run a busybox container followed by a command:
 
    `docker run busybox ls -la`
 
-The BusyBox `ls -la` command is ran and the content of the container is displayed
+The Docker client[^1] finds the image, creates a command and runs the `ls -la` command in that container:
 
 ```bash
 drwxr-xr-x    1 root     root          4096 Apr  9 16:22 .
@@ -49,3 +51,49 @@ The command is executed within the container, and the process stops. If we want 
 > The `sh` command to start shell is not really necessary in this case, and an interactive shell will start even if we run the container without any command because `sh` is the default command defined in the BusyBox image. The image has something like `CMD[sh]` in its Dockerfile so whe you don't specify a command Docker falls back to that default, which happens to be the shell.
 > Specifiying the command wuld matter using an image where the default command is not a shell, for instance
 >   `docker run -it python sh`
+
+## Container isolation
+
+`docker ps -a` displays a list of all the containers that we have ran:
+
+```bash
+CONTAINER ID   IMAGE     COMMAND   CREATED          STATUS                      PORTS     NAMES
+116268d6f047   alpine    "ash"     10 minutes ago   Exited (0) 9 minutes ago              reverent_volhard
+a8ee7dd5130a   alpine    "sh"      12 minutes ago   Exited (0) 11 minutes ago             awesome_gauss
+309a1b13c3bb   busybox   "sh"      13 minutes ago   Exited (0) 12 minutes ago             practical_elion
+```
+
+In the example we see that even though each `docker container run` command used the same alpine image, each execution was a separate, isolated container. Each container has a separate filesystem and runs in a different namespace; by default a container has no way of interacting with other containers, even those from the same image. Any change done within a container (e.g. creating a new file) will not affect the rest. This is a critical security concept in the world of Docker containers.
+
+To restart a container session, we can use docker command `start`. However, running
+
+   ~~`docker start 116`~~
+
+makes the container run in the underground quietly with no terminal attached, so we cannot interact with it. To do so, before starting the container we need to attach to it:
+
+   `docker start 116268`
+   `docker attach 1162`
+
+Or, alternatively, we can combine both commands in one go using `-a` (attach) and `-i` (interactively) options:
+
+   `docker start -ai 116268d6f`
+
+## Deleting containers
+
+Leaving all those stray containers eat up disk space. To clean up once we have done with them, use the `rm` command:
+
+   `docker rm <container ID>`
+
+To delete a bunch of containers in one go:
+
+   `docker rm $(docker ps -a -q -f status=exited)`
+
+In later versions, `docker container prune` command does the same.
+
+## Creating our own images
+
+
+
+[^1] The *Docker client* is the command line tool that allows the user to interact with the *Docker daemon*[^2]
+
+[^2] The *Docker deamon* is the background service running on the host that manages building, running and distributing Docker containers.
