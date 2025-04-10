@@ -119,19 +119,19 @@ figlet "Hello!"
 
 Our container installs the 'figlet' package and runs it, displaying 'Hello' in an ASCII-art way. If we want to share our new application, we must **`commit`** our changes:
 
-   `docker container commit <container_ID>`
+   ```docker container commit <container_ID>```
 
 We can also **`tag`** it so that it is easier to identify when we display a list of our system `images`:
 
-   `docker image tag <container_ID> <my_image_name>`
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker image tag <container_ID> <my_image_name>`
 
 In case we want to list the files that were added or changed to the original container, we can use the **`diff`** command:
 
-   `docker container diff <container_ID>`
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker container diff <container_ID>`
 
-Now we can run a container based on our newly created <my_image_name> image:
+Now we can run a container based on our newly created _<my_image_name>_ image:
 
-   `docker container run my_image_name figlet hello!`
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker container run my_image_name figlet hello!`
 
 [^1] The *Docker client* is the command line tool that allows the user to interact with the *Docker daemon*[^2]
 
