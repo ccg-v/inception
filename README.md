@@ -13,13 +13,13 @@ BusyBox is a tiny Linux distro that packages many common Unix utilities (`ls`, `
 
 First we are going to pull busybox image from Docker hub:
 
-`docker pull busybox`
+   `docker pull busybox`
 
 Next we run a busybox container followed by a command:
 
-`docker run busybox ls`
+   `docker run busybox ls -la`
 
-The BusyBox `ls` command is ran and the content of the continer is displayed
+The BusyBox `ls -la` command is ran and the content of the container is displayed
 
 ```bash
 drwxr-xr-x    1 root     root          4096 Apr  9 16:22 .
@@ -39,6 +39,13 @@ drwxr-xr-x    4 root     root          4096 Sep 26  2024 usr
 drwxr-xr-x    4 root     root          4096 Sep 26  2024 var
 ```
 
+The command is executed within the container, and the process stops. If we want to start an interactive session, the `-it` option allows to interact with the container via a shell:
 
+   `docker run -it busybox sh`
+
+- `-i` option (i stands for interactive) tells Docker to keep STDIN open on the container, allowing it to receive input like typed commands or piped data
+- `-t` option (stands for teletype/terminal) allocates a pseudo-tty which gives you a terminal interface on your machine
 	
- 
+> The `sh` command to start shell is not really necessary in this case, and an interactive shell will start even if we run the container without any command because `sh` is the default command defined in the BusyBox image. The image has something like `CMD[sh]` in its Dockerfile so whe you don't specify a command Docker falls back to that default, which happens to be the shell.
+> Specifiying the command wuld matter using an image where the default command is not a shell, for instance
+>   `docker run -it python sh`
