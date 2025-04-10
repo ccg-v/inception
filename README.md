@@ -121,7 +121,7 @@ Our container installs the _figlet_ package and runs it, displaying 'Hello' in a
 
 ```docker container commit <container_ID>```
 
-We can also **`tag`** it so that it is easier to identify when we display a list of our system `images`:
+We can also <ins>**`tag`**</ins> it so that it is easier to identify when we display a list of our system `images`:
 
    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker image tag <container_ID> <my_image_name>`
 
@@ -133,9 +133,9 @@ Now we can run a container based on our newly created _<my_image_name>_ image:
 
    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker container run my_image_name figlet hello!`
 
-[^1] The *Docker client* is the command line tool that allows the user to interact with the *Docker daemon*[^2]
+[^1]The *Docker client* is the command line tool that allows the user to interact with the *Docker daemon*[^2]
 
-[^2] The *Docker daemon* is the background service running on the host that manages building, running and distributing Docker containers.
+[^2]The *Docker daemon* is the background service running on the host that manages building, running and distributing Docker containers.
 
 
 ## Creating our images using a Dockerfile
