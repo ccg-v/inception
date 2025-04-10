@@ -11,7 +11,7 @@
 
 ---------------------------
 
-## Running a container
+## 1. Running a container
 
 BusyBox is a tiny Linux distro that packages many common Unix utilities (`ls`, `sh`, `cat`, ...) into a single binary, resulting in a very small image (usually less than 1 Mb.)
 
@@ -19,9 +19,13 @@ First we are going to pull busybox image from Docker hub:
 
    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker pull busybox`
 
-Next we run a busybox container followed by a command:
+Now we run a busybox container followed by a command:
 
    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker run busybox ls -la`
+
+We can give the container a name with the **<ins>--name</ins>** flag. If we don't specify any name, Docker will assign to our container a funny random one.
+
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker run --name < my_custom_container> busybox ls -la`
 
 The Docker client[^1] finds the image, creates a command and runs the `ls -la` command in that container:
 
@@ -58,7 +62,7 @@ To finish shell session, use the <ins>**`exit`**</ins> command.
 
 ---------------------------
 
-## Container isolation. Restarting/executing containers.
+## 2. Container isolation. Restarting/executing containers.
 
 <ins>**`docker ps -a`**</ins> displays a list of all the containers, even the stopped ones:
 
@@ -95,7 +99,7 @@ This command can also be used as a third way to start an interactive session wit
 
 ---------------------------
 
-## Deleting containers
+## 3. Deleting containers
 
 Leaving all those stray containers eat up disk space. To clean up once we have done with them, use the <ins>**`rm`**</ins> command:
 
@@ -107,6 +111,7 @@ To delete a bunch of containers in one go:
 
 In later versions, `docker container prune` command does the same.
 
+---------------------------
 
 ## Creating our own images
 
@@ -137,15 +142,46 @@ Now we can run a container based on our newly created _<my_image_name>_ image:
 
 ---------------------------
 
-## Creating our images using a Dockerfile
+## 4. Creating our images using a Dockerfile
 
 What we have just created is a static binary image, that is, a file system with the modified files, executables and configs. These are "raw binary files" in the sense that it’s just the built, saved state of the container at that moment.
 - This image can be run but you don't know how it was built.
 - You can't easily reproduce, modify or update its content unless you reverse-engineer it.
 
-A Dockerfile
+A Dockerfile supplies the instructions for building the image, rather than just the raw binary files. This is useful because it becomes much easier to manage changes, especially as your images get bigger and more complex. It's kind of a Makefile, where you supply the instructions for building the executable, instead of just providing the binary file.
 
+Let's create a Dockerfile to build our own 'hello world' application in bash. This is the script we are going to run, _hello.sh_:
 
+```bash
+#!/bin/sh 
+echo "hello from $(hostname)"
+```
+
+To build our image, we will use alpine as the base OS image, copy our source code -the script- into the container and specify the default command to be run upon container creation:
+
+```bash
+FROM alpine
+COPY hello.sh /app/hello.sh
+RUN chmod +x /app/hello.sh
+WORKDIR /app
+CMD ["/app/hello.sh"]
+```
+
+> Should our script be written in bash (just change the _shebang_ to `#!/bin/bash`), Alpine would not be able to run it because it does not include by default. In this case, we would have to add a line to our Dockerfile:\
+> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`RUN apk update && apk add bash`\
+> to install Bash.
+
+To <ins>**build**</ins> the image:
+
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker image build -t hello:bash .`
+
+And to run it:
+
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker container run hello:bash`
+
+Finally, this is our output:
+
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hello from b1ebb08fb32e
 
 
 
