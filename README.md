@@ -15,11 +15,11 @@ BusyBox is a tiny Linux distro that packages many common Unix utilities (`ls`, `
 
 First we are going to pull busybox image from Docker hub:
 
-   `docker *pull* busybox`
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker pull busybox`
 
 Next we run a busybox container followed by a command:
 
-   `docker run busybox ls -la`
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker run busybox ls -la`
 
 The Docker client[^1] finds the image, creates a command and runs the `ls -la` command in that container:
 
@@ -43,7 +43,7 @@ drwxr-xr-x    4 root     root          4096 Sep 26  2024 var
 
 The command is executed within the container, and the process stops. If we want to start an interactive session, the **`-it`** option allows to interact with the container via a shell:
 
-   `docker run -it busybox sh`
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker run -it busybox sh`
 
 - `-i` option (i stands for interactive) tells Docker to keep STDIN open on the container, allowing it to receive input like typed commands or piped data
 - `-t` option (stands for teletype/terminal) allocates a pseudo-tty which gives you a terminal interface on your machine
@@ -52,12 +52,12 @@ The command is executed within the container, and the process stops. If we want 
 > Specifiying the command wuld matter using an image where the default command is not a shell, for instance
 >   `docker run -it python sh`
 
-To finish shell session, use the **`exit`** command.
+To finish shell session, use the <ins>**`exit`**</ins> command.
 
 
 ## Container isolation. Restarting/executing containers.
 
-**`docker ps -a`** displays a list of all the containers, even the stopped ones:
+<ins>**`docker ps -a`**</ins> displays a list of all the containers, even the stopped ones:
 
 ```bash
 CONTAINER ID   IMAGE     COMMAND   CREATED          STATUS                      PORTS     NAMES
@@ -68,40 +68,40 @@ a8ee7dd5130a   alpine    "sh"      12 minutes ago   Exited (0) 11 minutes ago   
 
 In the example we see that even though each `docker container run` command used the same alpine image, each execution was a separate, isolated container. Each container has a separate filesystem and runs in a different namespace; by default a container has no way of interacting with other containers, even those from the same image. Any change done within a container (e.g. creating a new file) will not affect the rest. This is a critical security concept in the world of Docker containers.
 
-To restart a container session, we can use docker command **`start`**. However, running
+To restart a container session, we can use docker command <ins>**`start`**</ins>. However, running
 
-   ~~`docker start 116`~~
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~~`docker start 116`~~
 
-makes the container run in the underground quietly with no terminal attached, so we cannot interact with it. To do so, before starting the container we need to **`attach`** to it:
+makes the container run in the underground quietly with no terminal attached, so we cannot interact with it. To do so, before starting the container we need to <ins>**`attach`**</ins> to it:
 
-   `docker start 116268`
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker start 116268`
 
-   `docker attach 1162`
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker attach 1162`
 
 Or, alternatively, we can combine both commands in one go using `-a` (attach) and `-i` (interactively) options:
 
-   `docker start -ai 116268d6f`
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker start -ai 116268d6f`
 
-We can send a command in to the container to run by using the **`exec`** command:
+We can send a command in to the container to run by using the <ins>**`exec`**</ins> command:
 
-   `docker exec <container_ID> ls -la`
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker exec <container_ID> ls -la`
 
 This command can also be used as a third way to start an interactive session with a stopped container:
 
-   `docker start 116268d6f047`
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker start 116268d6f047`
 
-   `docker exec -it 116268d6f047 sh`
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker exec -it 116268d6f047 sh`
 
 
 ## Deleting containers
 
-Leaving all those stray containers eat up disk space. To clean up once we have done with them, use the **`rm`** command:
+Leaving all those stray containers eat up disk space. To clean up once we have done with them, use the <ins>**`rm`**</ins> command:
 
-   `docker rm <container ID>`
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker rm <container ID>`
 
 To delete a bunch of containers in one go:
 
-   `docker rm $(docker ps -a -q -f status=exited)`
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker rm $(docker ps -a -q -f status=exited)`
 
 In later versions, `docker container prune` command does the same.
 
@@ -117,15 +117,15 @@ apt-get install -y figlet
 figlet "Hello!"
 ```
 
-Our container installs the _figlet_ package and runs it, displaying 'Hello' in an ASCII-art way. If we want to share our new application, we must **`commit`** our changes:
+Our container installs the _figlet_ package and runs it, displaying 'Hello' in an ASCII-art way. If we want to share our new application, we must <ins>**`commit`**</ins> our changes:
 
-```docker container commit <container_ID>```
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker container commit <container_ID>`
 
 We can also <ins>**`tag`**</ins> it so that it is easier to identify when we display a list of our system `images`:
 
    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker image tag <container_ID> <my_image_name>`
 
-In case we want to list the files that were added or changed to the original container, we can use the **`diff`** command:
+In case we want to list the files that were added or changed to the original container, we can use the <ins>**`diff`**</ins> command:
 
    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker container diff <container_ID>`
 
@@ -133,9 +133,9 @@ Now we can run a container based on our newly created _<my_image_name>_ image:
 
    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker container run my_image_name figlet hello!`
 
-[^1]The *Docker client* is the command line tool that allows the user to interact with the *Docker daemon*[^2]
+[^1]: The *Docker client* is the command line tool that allows the user to interact with the *Docker daemon*[^2]
 
-[^2]The *Docker daemon* is the background service running on the host that manages building, running and distributing Docker containers.
+[^2]: The *Docker daemon* is the background service running on the host that manages building, running and distributing Docker containers.
 
 
 ## Creating our images using a Dockerfile
