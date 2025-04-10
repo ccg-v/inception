@@ -74,8 +74,7 @@ To restart a container session, we can use docker command <ins>**`start`**</ins>
 
 makes the container run in the underground quietly with no terminal attached, so we cannot interact with it. To do so, before starting the container we need to <ins>**`attach`**</ins> to it:
 
-   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker start 116268`
-
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker start 116268`\
    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker attach 1162`
 
 Or, alternatively, we can combine both commands in one go using `-a` (attach) and `-i` (interactively) options:
@@ -88,8 +87,7 @@ We can send a command in to the container to run by using the <ins>**`exec`**</i
 
 This command can also be used as a third way to start an interactive session with a stopped container:
 
-   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker start 116268d6f047`
-
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker start 116268d6f047`\
    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker exec -it 116268d6f047 sh`
 
 
@@ -142,9 +140,6 @@ What we have just created is a static binary image, that is, a file system with 
 
 A Dockerfile
 
-<font color="red">This text is red!</font>
-
-<p style="color:blue">Make this text blue.</p>
 
 
 
