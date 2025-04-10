@@ -121,7 +121,7 @@ Our container installs the _figlet_ package and runs it, displaying 'Hello' in a
 
    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker container commit <container_ID>`
 
-We can also <ins>**`tag`**</ins> it so that it is easier to identify when we display a list of our system `images`:
+We can also <ins>**`tag`**</ins> our custom image so that it is easier to identify when we display a list of our system `images`:
 
    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker image tag <container_ID> <my_image_name>`
 
@@ -133,15 +133,25 @@ Now we can run a container based on our newly created _<my_image_name>_ image:
 
    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker container run my_image_name figlet hello!`
 
-[^1]: The *Docker client* is the command line tool that allows the user to interact with the *Docker daemon*[^2]
-
-[^2]: The *Docker daemon* is the background service running on the host that manages building, running and distributing Docker containers.
-
 
 ## Creating our images using a Dockerfile
 
 What we have just created is a static binary image, that is, a file system with the modified files, executables and configs. These are "raw binary files" in the sense that it’s just the built, saved state of the container at that moment.
-- This image can be run but you don't know how it was built
-- You can't easily reproduce, modify or update its content unless you <ins>reverse-engineer</ins> it
+- This image can be run but you don't know how it was built.
+- You can't easily reproduce, modify or update its content unless you reverse-engineer it.
 
 A Dockerfile
+
+<font color="red">This text is red!</font>
+
+<p style="color:blue">Make this text blue.</p>
+
+
+
+
+
+
+
+[^1]: The *Docker client* is the command line tool that allows the user to interact with the *Docker daemon*[^2]
+
+[^2]: The *Docker daemon* is the background service running on the host that manages building, running and distributing Docker containers.
