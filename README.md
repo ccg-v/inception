@@ -60,6 +60,14 @@ The command is executed within the container, and the process stops. If we want 
 
 To finish shell session, use the <ins>**`exit`**</ins> command.
 
+If the image already exists in Docker registries, even if we haven't pulled it the image will be downloaded and installed automatically. 
+
+By default, the image pulled is the `latest` version. If we want to download a different one, we must add its tag after the command (separated by a colon):
+
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker run -it wordpress:beta-6.8-php8.3`
+
+Available versions can be checked at Docker registries (e.g. https://hub.docker.com/)
+
 ---------------------------
 
 ## 2. Container isolation. Restarting/executing containers.
@@ -171,6 +179,9 @@ CMD ["/app/hello.sh"]
 > &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`RUN apk update && apk add bash`\
 > to install Bash.
 
+> To pass an argument to command: `CMD["executable", "argument"]`\
+> To wait for argument after execution: `ENTRYPOINT["executable"]`
+
 To <ins>**build**</ins> the image:
 
    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker image build -t hello:bash .`
@@ -183,6 +194,11 @@ Finally, this is our output:
 
    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hello from b1ebb08fb32e
 
+---------------------------
+
+## Multi-container
+
+1. Create a container network, to grant containers see each other
 
 
 
