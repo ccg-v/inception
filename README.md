@@ -66,7 +66,7 @@ By default, the image pulled is the `latest` version. If we want to download a d
 
    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker run -it wordpress:beta-6.8-php8.3`
 
-Available versions can be checked at Docker registries (e.g. https://hub.docker.com/)
+Available versions can be checked at Docker registries (e.g. https://hub.docker.com/). In terminal, we can also run `docker search wordpress`
 
 ---------------------------
 
