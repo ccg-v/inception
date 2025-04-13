@@ -1,6 +1,28 @@
 # Docker
 
-## Basic commands
+**Docker** is a set of platform as a service (PaaS) products that use OS-level virtualization to deliver software in packages called containers.
+
+**Containers** are packages of software that include the application and its dependencies. They are isolated environments in the host machine with the ability to interact with each other and the host machine itself via defined methods (TCP/UDP).
+
+Virtual machines and containers solve different problems:
+
+- **Virtual machines** (VM) run on a hypervisor (a type of computer software, firmware or hardware that creates and runs virtual machines), which virtualizes the physical hardware. Each VM includes a full operating system (OS) along with the necessary binaries and libraries, making them heavier and more resource-intensive.
+- **Containers**, on the other hand, share the host OS kernel and only package the application and its dependencies, resulting in a more lightweight and efficient solution.
+
+- **Virtual machines** provide strong isolation and are suited for running multiple OS environments, but they have a performance overhead and longer startup times.
+- **Containers** offer faster startup, better resource utilization, and high portability across different environments, though their isolation is at the process level, which may not be as robust as that of VMs
+
+Docker relies on Linux kernels, which means that macOS and Windows cannot run Docker natively without some additional steps. Each operating system has its own solution for running Docker. For example, Docker for Mac uses under the hood actually a virtual machine that runs a Linux instance, within which Docker operates.
+
+An **image** is a blueprint with all the necessary instructions and dependencies needed to build a container. An image and a container runtime (Docker engine) is all you need to create a container. Thus, containers are instances of images.
+
+## Docker CLI basics
+
+We use the command line to interact with the _Docker engine_ that is made up of 3 parts:
+ - command line interface (CLI) client
+ - a REST API
+ - Docker daemon
+When you run a command, behind the scenes the CLI client sends a request through the REST API to the Docker daemon which takes care of images, containers and other resources. The most basic commands are: 
 
 - docker **`pull`** <image>	: Fetches the given image from the Docker registry
 - docker **`images`**		: Lists all images fetched to our system
@@ -121,7 +143,7 @@ In later versions, `docker container prune` command does the same.
 
 ---------------------------
 
-## Creating our own images
+## 4. Creating and deleting images
 
 We can pull an existing image, run it in a container and modify it as needed. E.g.:
 
@@ -148,9 +170,13 @@ Now we can run a container based on our newly created _<my_image_name>_ image:
 
    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker container run my_image_name figlet hello!`
 
----------------------------
+If we don't need the image anymore, we can delete it from our system:
 
-## 4. Creating our images using a Dockerfile
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker image rm my_image_name`
+
+---
+
+## 6. Creating our images using a Dockerfile
 
 What we have just created is a static binary image, that is, a file system with the modified files, executables and configs. These are "raw binary files" in the sense that it’s just the built, saved state of the container at that moment.
 - This image can be run but you don't know how it was built.
