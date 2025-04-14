@@ -27,7 +27,7 @@ When you run a command, behind the scenes the CLI client sends a request through
 - docker **`pull`** <image>	: Fetches the given image from the Docker registry
 - docker **`images`**		: Lists all images fetched to our system
 - docker **`run`** <image>	: Runs a Docker container based on the provided image
-- docker **`ps`**			: (**p**rocess **s**tatus) Shows all the containers that we have currently running 
+- docker **`ps`**			: (**<ins>p</ins>**rocess **<ins>s</ins>**tatus) Shows all the containers that we have currently running 
 - docker **`ps -a`**		: Shows all the containers that we have ran but are currently inactive
 - docker <command> `--help`	: Displays help (basically available options) about provided command
 
@@ -191,26 +191,27 @@ Let's create a Dockerfile to build our own 'hello world' application in bash. Th
 echo "hello from $(hostname)"
 ```
 
-To build our image, we will use alpine as the base OS image, copy our source code -the script- into the container and specify the default command to be run upon container creation:
+To build our image, we will use alpine (an specific version, 3.21) as the base OS image, copy our source code -the script- into the container and specify the default command to be run upon container creation:
 
 ```bash
-FROM alpine
-COPY hello.sh /app/hello.sh
-RUN chmod +x /app/hello.sh
-WORKDIR /app
-CMD ["/app/hello.sh"]
+FROM alpine:3.21
+WORKDIR usr/src/app
+COPY hello.sh .
+RUN chmod +x hello.sh
+CMD ./hello.sh
 ```
 
 > Should our script be written in bash (just change the _shebang_ to `#!/bin/bash`), Alpine would not be able to run it because it does not include by default. In this case, we would have to add a line to our Dockerfile:\
 > &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`RUN apk update && apk add bash`\
 > to install Bash.
 
+> [!NOTE]
 > To pass an argument to command: `CMD["executable", "argument"]`\
 > To wait for argument after execution: `ENTRYPOINT["executable"]`
 
 To <ins>**build**</ins> the image:
 
-   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker image build -t hello:bash .`
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker image build . -t hello:bash .`
 
 And to run it:
 
@@ -219,6 +220,9 @@ And to run it:
 Finally, this is our output:
 
    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hello from b1ebb08fb32e
+
+> [!NOTE]
+> When writing a Dockerfile we should always try to keep the most prone-to-change rows at the bottom, to preserve as much cached-layers as possible and speed up the build process (read more about Docker build cache [here](https://docs.docker.com/build/cache/))
 
 ---------------------------
 
