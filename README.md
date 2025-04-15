@@ -226,9 +226,35 @@ Finally, this is our output:
 
 ---------------------------
 
-## Multi-container
+## 7. Ensuring persistent data: **Mounts**
 
-1. Create a container network, to grant containers see each other
+Containers are ephemeral, their data vanishes when they're removed. If you want to persist data, or share files between your host and the container, you need *mounts*.
+
+Docker has three main types:
+ - **Bind mounts**
+ - **Volumes**
+ - **Tmpfs**
+
+# 7.1 Bind Mount: You pick the folder
+
+By default host directories are not available in the container file system , but with **bind mounts** we can access the host filesystem. **Bind mount** is a way to connect or link a directory or file from your computer’s file system to a specific location inside a Docker container. Usage:
+
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker run -v /host/path:/path/in/container image:tag`
+
+Example:
+
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker run -v /home/carlos/dev:/app ubuntu:24.04`
+
+will map the local folder `/home/carlos/dev` into the container at `/app`.
+
+You can easily update the files on your computer, and the changes will be instantly reflected inside the container without the need to rebuild or modify the container itself.
+
+Bind mounts tightly couple the container to the host machine’s filesystem, which means that processes running in a container can modify the host filesystem. This includes creating, modifying, or deleting system files or directories. Therefore, it is crucial to be cautious with permissions and ensure proper access controls to prevent any security risks or conflicts.
+
+Bind mounts are not directly managed by Docker, they rely on a host folder structure.
+
+
+
 
 
 
