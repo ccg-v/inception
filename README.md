@@ -226,18 +226,24 @@ Finally, this is our output:
 
 ---------------------------
 
-## 7. Ensuring persistent data: **Mounts**
+## 7. Mounts: Sharing and keeping persistent data
 
-Containers are ephemeral, their data vanishes when they're removed. If you want to persist data, or share files between your host and the container, you need *mounts*.
+Containers are ephemeral, their data vanishes when they're removed. If you want to persist data, or share files between your host and the container, you need **mounts**.
 
-Docker has three main types:
+Mounts are a way to manage and store data separately from the containers themselves. They provide a means to store and share files and directories that can persist during the container's lifetime.
+
+Furthermore, mounts enable data sharing among multiple containers. For instance, you can create a mount and attach it to different containers running different services, allowing them to access and manipulate the shared data. This promotes modularity and flexibility in your Docker setup.
+
+Docker has three main types of mounts:
  - **Bind mounts**
  - **Volumes**
  - **Tmpfs**
 
-# 7.1 Bind Mount: You pick the folder
+### 7.1 Bind Mount: You pick the folder
 
-By default host directories are not available in the container file system , but with **bind mounts** we can access the host filesystem. **Bind mount** is a way to connect or link a directory or file from your computer’s file system to a specific location inside a Docker container. Usage:
+By default host directories are not available in the container file system , but with **bind mounts** we can access the host filesystem. **Bind mount** is a way to connect or link a directory or file from your computer’s file system to a specific location inside a Docker container.
+
+Usage in Docker CLI:
 
    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker run -v /host/path:/path/in/container image:tag`
 
@@ -249,16 +255,124 @@ will map the local folder `/home/carlos/dev` into the container at `/app`.
 
 You can easily update the files on your computer, and the changes will be instantly reflected inside the container without the need to rebuild or modify the container itself.
 
-Bind mounts tightly couple the container to the host machine’s filesystem, which means that processes running in a container can modify the host filesystem. This includes creating, modifying, or deleting system files or directories. Therefore, it is crucial to be cautious with permissions and ensure proper access controls to prevent any security risks or conflicts.
+Bind mounts tightly couple the container to the host machine’s filesystem, which means that processes running in a container can modify the host filesystem. This includes creating, modifying, or deleting system files or directories. Therefore, _it is crucial to be cautious with permissions and ensure proper access controls to prevent any security risks or conflicts_.
 
 Bind mounts are not directly managed by Docker, they rely on a host folder structure.
 
+When to use bind mounts:
+- Development environments (live code changes on host appear immediately in the container)
+- Need host-specific access and loading resources that may not be accessible from within the container such as devices or system files
 
+### 7.2 Volume mount: Docker-managed storage
 
+**Volume mounts** are like bind mounts but they are fully managed by docker itself. Volumes are stored in the Linux Virtual Machine rather than the host. 
 
+Usage in Docker CLI:
 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker run -v myvolume:/path/in/container image:tag`
 
+Example:
 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker run -v myvolume:/app/data ubuntu:24.04`
+
+will mount Docker-managed volume `myvolume` to `/app/data` inside the container.
+
+Benefits of Volume mounts:
+
+- Better Performance due to their utilization of optimized drivers and file systems.
+- Managed by Docker and can be easily backed up, restored, or migrated between different Docker installations.
+- better portability and cross-platform compatibility
+
+When to use Volume mounts:
+
+- Persisting Database Data
+- Handling File Uploads and Downloads
+- Storing log files
+- Changing or Applying New Configuration Files
+- Backup and Restore
+
+### 7.3 tmpfs: Fast but volatile
+
+**tmpfs** (_Temporary File System_) is a Linux kernel feature, a type of filesystem that resides entirely in volatile memory (RAM), not on disk. Consequently,
+- While Docker triggers the creation of the tmpfs mount, the actual memory management is done by the host kernel.
+- When the container stops or is recreated, the data vanishes. That makes it ideal for:
+	- Sensitive data (like credentials or session keys)
+	- Scratch space (intermediate calculations, temp files)
+	- High-speed operations (RAM is faster than disk)
+
+--tmpfs doesn't take a host path or volume name — it just tells Docker: “Mount a RAM-backed filesystem at this path inside the container.”:
+
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker run --tmpfs /path/in/container image:tag`
+
+You can even specify size and mount options if needed:
+
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker run --tmpfs /path/in/container:rw,size=64m image:tag`
+
+### 7.4 Docker commands for managing mounts
+
+```bash
+//Inspecting Mounts used in a container
+docker inspect [container_id] --format='{{ .Mounts }}'
+
+//Creating volumes
+docker volume create [volume-name]
+
+//Inspect info about volume
+docker volume inspect [volume-name]
+
+//Remove volume
+docker volume rm [volume-name]
+```
+---
+
+## 8. Ports: networking/communication
+
+We can use ports to communicate with a containerized application, mapping your host machine port to a container port.
+
+Opening a connection from the outside world to a Docker container happens in two steps:
+- Exposing port
+- Publishing port
+
+Exposing a container port means telling Docker that the container listens to a certain port. This does not do much except helping humans with the configuration.
+
+Publishing a port means that Docker will map host ports to the container port.
+
+- To expose a port, add the line `EXPOSE <port>` in the Dockerfile
+- To publish a port, run the container with `-p <host_port>:<container_port>
+
+Usage:
+
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker run -p <host_port>:<container_port> some-image`
+
+Example:
+
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker run -p 1000:2000 devopsdockeruh/simple-web-service`
+
+Here’s what happens:
+- Host is listening on port 1000.
+- Docker’s networking layer is watching that port.
+- When a connection comes in on host:1000, Docker intercepts it and forwards it to the container’s port 2000.
+Host just listens, it's Docker who handles the forwarding.
+
+Example:
+
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker run -p 8080:80 nginx`
+
+- The container is running a web server on port 80.
+- You access it from your browser via http://localhost:8080.
+- The traffic is forwarded from your host's port 8080 to container's port 80.
+
+If you leave out the host port and only specify the container port, Docker will automatically choose a free port as the host port:
+
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker run -p 4567 app-in-port`
+
+We could also limit connections to a certain protocol only, e.g. UDP by adding the protocol at the end: `EXPOSE <port>/udp` and `-p <host-port>:<container-port>/udp`.   
+
+> [!CAUTION]
+> Since we are opening a port to the application, anyone from the internet could come in and access what we are running.
+> A way for an attacker to get in is by exploiting a port we opened to an insecure server. An easy way to avoid this is by defining the host-side port like this `-p 127.0.0.1:3456:3000`. This will only allow requests from our computer through port 3456 to the application port 3000, with no outside access allowed.
+> The short syntax, `-p 3456:3000`, will result in the same as `-p 0.0.0.0:3456:3000`, which truly is opening the port to everyone.
+> Usually, this isn't risky. But depending on the application, it is something we should consider.
 
 [^1]: The *Docker client* is the command line tool that allows the user to interact with the *Docker daemon*[^2]
 
