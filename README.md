@@ -176,7 +176,7 @@ If we don't need the image anymore, we can delete it from our system:
 
 ---
 
-## 6. Creating our images using a Dockerfile
+## 5. Creating our images using a Dockerfile
 
 What we have just created is a static binary image, that is, a file system with the modified files, executables and configs. These are "raw binary files" in the sense that it’s just the built, saved state of the container at that moment.
 - This image can be run but you don't know how it was built.
@@ -226,7 +226,7 @@ Finally, this is our output:
 
 ---------------------------
 
-## 7. Mounts: Sharing and keeping persistent data
+## 6. Mounts: Sharing and keeping persistent data
 
 Containers are ephemeral, their data vanishes when they're removed. If you want to persist data, or share files between your host and the container, you need **mounts**.
 
@@ -239,7 +239,7 @@ Docker has three main types of mounts:
  - **Volumes**
  - **Tmpfs**
 
-### 7.1 Bind Mount: You pick the folder
+### 6.1 Bind Mount: You pick the folder
 
 By default host directories are not available in the container file system , but with **bind mounts** we can access the host filesystem. **Bind mount** is a way to connect or link a directory or file from your computer’s file system to a specific location inside a Docker container.
 
@@ -263,7 +263,7 @@ When to use bind mounts:
 - Development environments (live code changes on host appear immediately in the container)
 - Need host-specific access and loading resources that may not be accessible from within the container such as devices or system files
 
-### 7.2 Volume mount: Docker-managed storage
+### 6.2 Volume mount: Docker-managed storage
 
 **Volume mounts** are like bind mounts but they are fully managed by docker itself. Volumes are stored in the Linux Virtual Machine rather than the host. 
 
@@ -291,7 +291,7 @@ When to use Volume mounts:
 - Changing or Applying New Configuration Files
 - Backup and Restore
 
-### 7.3 tmpfs: Fast but volatile
+### 6.3 tmpfs: Fast but volatile
 
 **tmpfs** (_Temporary File System_) is a Linux kernel feature, a type of filesystem that resides entirely in volatile memory (RAM), not on disk. Consequently,
 - While Docker triggers the creation of the tmpfs mount, the actual memory management is done by the host kernel.
@@ -325,7 +325,7 @@ docker volume rm [volume-name]
 ```
 ---
 
-## 8. Ports: networking/communication
+## 7. Ports: networking/communication
 
 We can use ports to communicate with a containerized application, mapping your host machine port to a container port.
 
@@ -373,6 +373,80 @@ We could also limit connections to a certain protocol only, e.g. UDP by adding t
 > A way for an attacker to get in is by exploiting a port we opened to an insecure server. An easy way to avoid this is by defining the host-side port like this `-p 127.0.0.1:3456:3000`. This will only allow requests from our computer through port 3456 to the application port 3000, with no outside access allowed.
 > The short syntax, `-p 3456:3000`, will result in the same as `-p 0.0.0.0:3456:3000`, which truly is opening the port to everyone.
 > Usually, this isn't risky. But depending on the application, it is something we should consider.
+
+---
+
+## 8. Docker Compose
+
+Docker Compose is a tool designed to simplify running multi-container applications using a single command:
+
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker compose [-f <arg>...] [options] [COMMAND] [ARGS...]`
+
+Example:
+
+Assume we are in the folder where we have our Dockerfile with the following content:
+
+```bash
+FROM ubuntu:24.04
+WORKDIR /mydir
+RUN apt-get update && apt-get install -y curl python3
+RUN curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp
+RUN chmod a+x /usr/local/bin/yt-dlp
+ENTRYPOINT ["/usr/local/bin/yt-dlp"]
+```
+
+Let us now create a file called `docker-compose.yml`:
+
+```bash
+services:
+  yt-dlp-ubuntu:
+    image: <username>/<repositoryname>
+    build: .
+```
+
+The file defines:
+- One service with name `yt-dlp-ubuntu`
+- The name the new image is going to be tagged with
+- The key `build` can be a file system path (in the example it is the current directory .) or an object with sub-keys `context` and `dockerfile` (see [documentation](https://docs.docker.com/reference/compose-file/build/))
+
+It is pretty common that we use some readily built images, and in that case, the key `build` is not needed. For instance,
+
+```bash
+services:
+  nginx:
+    image: nginx:1.27
+  database:
+    image: postgres:17
+```
+
+## 8.1 Volumes in Docker Compose
+
+**Volumes** in Docker compose are defined with the following syntax:
+
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`location-in-host:location-in-container`
+
+Example:
+
+```bash
+services:
+  yt-dlp-ubuntu:
+    image: <username>/<repositoryname>
+    build: .
+    volumes:
+      - .:/mydir
+    container_name: yt-dlp
+```
+
+In this case, the **bind mount** is telling Docker to take the current directory on the host (.), and mount it inside the container at /mydir.
+
+## 8.2 Key Commands in Docker Compose
+
+- `docker compose up`	: Starts all services defined in the Docker compose file
+- `docker compose down`	: Stops and removes the running services
+- `docker compose logs`	: View the logs to monitor the output of the running containers and debug issues
+- `docker compose ps`	: Lists all the services along with their current status
+
+---
 
 [^1]: The *Docker client* is the command line tool that allows the user to interact with the *Docker daemon*[^2]
 
