@@ -572,13 +572,13 @@ In any case, it is also possible to define the network manually in a Docker Comp
 A network is defined in _docker-compose.yml_ file as follows:
 
 ```bash
-services:						# Top-level key
-  db:							# User-defined service identifier (we name this!)
+services:					# Top-level key
+  db:						# User-defined service identifier (we name this!)
     image: postgres:13.2-alpine	# Docker image (name:tag)
-    networks:					# Key inside the 'db' service config
+    networks:				# Key inside the 'db' service config
       - database-network 		# Reference to a user-defined network
 
-networks:						# Top-level key
+networks:					# Top-level key
   database-network: 			# User-defined network identifier
     name: database-network 		# Actual Docker network name (explicitly defined)
 ```
