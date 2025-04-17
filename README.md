@@ -592,9 +592,9 @@ services:
       - shared-network	# Internal name given to external network WITHIN this Compose file
 
 networks:
-  shared-network:		# Internal name given to external network WITHIN this Compose file
+  shared-network:	# Internal name given to external network WITHIN this Compose file
     external: true
-    name: prod-shared-net	# Actual name of the pre-existing external Docker network
+    name: prod-shared-net # Actual name of the pre-existing external Docker network
 ```
 
 If we use the external network name also internally, the Compose file can be simplified:
