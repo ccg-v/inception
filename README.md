@@ -576,15 +576,14 @@ services:				# Top-level key
   db:					# User-defined service identifier (we name this!)
     image: postgres:13.2-alpine		# Docker image (name:tag)
     networks:				# Key inside the 'db' service config
-      - database-network 		# Reference to a user-defined network
+      - internal-network 		# Reference to user-defined network ID (see below) 
 
 networks:				# Top-level key
-  database-network: 			# User-defined network identifier
-    name: database-network 		# Actual Docker network name (explicitly defined)
+  internal-network: 			# User-defined network identifier
+    name: prod-database-net		# This is the actual Docker network name (explicitly defined)
 ```
 
-- The _top-level key_ **networks** at the end defines the network
-- Each service 
+
 
 
 [^1]: The *Docker client* is the command line tool that allows the user to interact with the *Docker daemon*[^2]
