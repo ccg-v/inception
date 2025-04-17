@@ -241,7 +241,10 @@ Docker has three main types of mounts:
 
 ### 6.1 Bind Mount: You pick the folder
 
-By default host directories are not available in the container file system , but with **bind mounts** we can access the host filesystem. **Bind mount** is a way to connect or link a directory or file from your computer’s file system to a specific location inside a Docker container.
+By default host directories are not available in the container file system , but with **bind mounts** we can expose and access them. Bind mount makes a path in the container point directly to a path on the host — replacing anything that was originally at that container path. **It is a way to override a file or directory inside the container with one from the host system**. Rather than harmlessly _linking_ two paths, it is indeed a **one-way takeover** of the container path.
+
+> [!Warning]
+> When you mount a host path into a container, the original contents of that container path are hidden. This can be powerful for development or saving logs, but you must be careful not to mount over paths that the container depends on to run, like startup scripts or binaries.
 
 Usage in Docker CLI:
 
@@ -251,9 +254,10 @@ Example:
 
    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker run -v /home/carlos/dev:/app ubuntu:24.04`
 
-will map the local folder `/home/carlos/dev` into the container at `/app`.
+This maps the local folder `/home/carlos/dev` into the container at `/app`.
 
-You can easily update the files on your computer, and the changes will be instantly reflected inside the container without the need to rebuild or modify the container itself.
+- You can easily update the files on the host and see the changes immediately in the container.
+- No need to rebuild the container to test code changes
 
 Bind mounts tightly couple the container to the host machine’s filesystem, which means that processes running in a container can modify the host filesystem. This includes creating, modifying, or deleting system files or directories. Therefore, _it is crucial to be cautious with permissions and ensure proper access controls to prevent any security risks or conflicts_.
 
@@ -437,7 +441,7 @@ services:
     container_name: yt-dlp
 ```
 
-In this case, the **bind mount** is telling Docker to take the current directory on the host (.), and mount it inside the container at /mydir.
+In this case, the **bind mount** is telling Docker to _take the current directory on the host (.), and mount it inside the container at /mydir_.
 
 ## 8.2 Key Commands in Docker Compose
 
@@ -447,6 +451,33 @@ In this case, the **bind mount** is telling Docker to take the current directory
 - `docker compose ps`	: Lists all the services along with their current status
 
 ---
+
+## Binding ports in Docker Compose
+
+The following example builds a image from 'jwilder/whoami', a simple service that prints the current container id (hostname):
+
+```bash
+services:
+  whoami:
+    image: jwilder/whoami
+	build: .
+    ports:
+      - 8000:8000
+```
+Testing it with either:
+
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker compose up -d` \
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`curl localhost:8000`
+
+the output confirms that we have just binded host port 8000 to container port 8000, so the container is reachable via the host’s port 8000
+
+---
+
+## Setting environment variables within container's environment
+
+https://docs.docker.com/compose/how-tos/environment-variables/set-environment-variables/
+
+
 
 [^1]: The *Docker client* is the command line tool that allows the user to interact with the *Docker daemon*[^2]
 

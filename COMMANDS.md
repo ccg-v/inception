@@ -1,7 +1,12 @@
-`su -`				Switch to root user
-`getent group sudo`	List sudo group users
-`sudo whoami`		Check user status
-`groups`			List groups
+`su -` . . . . . . . . . . . . . . . . Switch to root user
+
+`groups` . . . . . . . . . . . . . . . List groups
+`getent group <groupname>` . . . . . . List <groupname> users
+`sudo whoami`. . . . . . . . . . . . . Check user status
+
+`sudo usermod -aG <groupname> $USER` . Add user to group
+
+
 
 To give superuser privileges:
 1. Switch to root user
