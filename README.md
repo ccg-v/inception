@@ -582,7 +582,7 @@ networks:				# Top-level key
     name: prod-database-net		# This is the actual Docker network name (explicitly defined)
 ```
 
-Establishing a **connection to an external network** (that is, a network defined in another docker-compose.yml) is done as follows:
+Establishing a <ins>**connection to an external network**</ins> (that is, a network defined in another docker-compose.yml) is done as follows:
 
 ```bash
 services:
