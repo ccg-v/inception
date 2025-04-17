@@ -424,9 +424,9 @@ services:
 ```
 
 > Proper naming:
-> > services: #top-level key
-> > nginx:  #user-defined identifier
-> > image: nginx:1.27 #Docker object (image) name (nginx) and tag (1.27)
+> > services:  #**top-level key**\
+> >    nginx:  #**user-defined identifier**\
+> >       image: nginx:1.27 #**Docker object** (_image_) **name** (_nginx_) and **tag** (_1.27_)
 
 ## 8.1 Volumes in Docker Compose
 
@@ -572,18 +572,19 @@ In any case, it is also possible to define the network manually in a Docker Comp
 A network is defined in _docker-compose.yml_ file as follows:
 
 ```bash
-services:
-  db:
-    image: postgres:13.2-alpine
-    networks:
-      - database-network # Name in this Docker Compose file
+services:						# Top-level key
+  db:							# User-defined service identifier (we name this!)
+    image: postgres:13.2-alpine	# Docker image (name:tag)
+    networks:					# Key inside the 'db' service config
+      - database-network 		# Reference to a user-defined network
 
-networks:
-  database-network: # Name in this Docker Compose file
-    name: database-network # Name that will be the actual name of the network
+networks:						# Top-level key
+  database-network: 			# User-defined network identifier
+    name: database-network 		# Actual Docker network name (explicitly defined)
 ```
 
-
+- The _top-level key_ **networks** at the end defines the network
+- Each service 
 
 
 [^1]: The *Docker client* is the command line tool that allows the user to interact with the *Docker daemon*[^2]
