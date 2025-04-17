@@ -174,7 +174,7 @@ If we don't need the image anymore, we can delete it from our system:
 
    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker image rm my_image_name`
 
----
+---------------------------
 
 ## 5. Creating our images using a Dockerfile
 
@@ -312,7 +312,7 @@ You can even specify size and mount options if needed:
 
    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker run --tmpfs /path/in/container:rw,size=64m image:tag`
 
-### 7.4 Docker commands for managing mounts
+### 6.4 Docker commands for managing mounts
 
 ```bash
 //Inspecting Mounts used in a container
@@ -327,7 +327,7 @@ docker volume inspect [volume-name]
 //Remove volume
 docker volume rm [volume-name]
 ```
----
+---------------------------
 
 ## 7. Ports: networking/communication
 
@@ -378,7 +378,7 @@ We could also limit connections to a certain protocol only, e.g. UDP by adding t
 > The short syntax, `-p 3456:3000`, will result in the same as `-p 0.0.0.0:3456:3000`, which truly is opening the port to everyone.
 > Usually, this isn't risky. But depending on the application, it is something we should consider.
 
----
+---------------------------
 
 ## 8. Docker Compose
 
@@ -455,7 +455,6 @@ In this case, the **bind mount** is telling Docker to _take the current director
 - `docker compose logs`	: View the logs to monitor the output of the running containers and debug issues
 - `docker compose ps`	: Lists all the services along with their current status
 
----
 
 ## 8.3 Binding ports in Docker Compose
 
@@ -476,7 +475,7 @@ Testing it with either:
 
 the output confirms that we have just binded host port 8000 to container port 8000, so the container is reachable via the host’s port 8000
 
----
+---------------------------
 
 ## 9.Setting environment variables within container's environment
 
@@ -553,7 +552,7 @@ A container's environment can also be set using `.env` files along with the `env
 				env_file: "myapp.env"
 		```
 
----
+---------------------------
 
 ## 10. Docker networking
 
@@ -583,6 +582,38 @@ networks:				# Top-level key
     name: prod-database-net		# This is the actual Docker network name (explicitly defined)
 ```
 
+Establishing a **connection to an external network** (that is, a network defined in another docker-compose.yml) is done as follows:
+
+```bash
+services:
+  app:
+    image: myapp
+    networks:
+      - shared-network	# Internal name given to external network WITHIN this Compose file
+
+networks:
+  shared-network:		# Internal name given to external network WITHIN this Compose file
+    external: true
+    name: prod-shared-net	# Actual name of the pre-existing external Docker network
+```
+
+If we use the external network name also internally, the Compose file can be simplified:
+
+```bash
+services:
+  app:
+    image: myapp
+    networks:
+      - prod-shared-net
+
+networks:
+  prod-shared-net:
+    external: true
+```
+
+---------------------------
+
+## 11. Scaling
 
 
 
