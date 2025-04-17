@@ -423,6 +423,11 @@ services:
     image: postgres:17
 ```
 
+> Proper naming:
+> > services: #top-level key
+> > nginx:  #user-defined identifier
+> > image: nginx:1.27 #Docker object (image) name (nginx) and tag (1.27)
+
 ## 8.1 Volumes in Docker Compose
 
 **Volumes** in Docker compose are defined with the following syntax:
@@ -554,24 +559,29 @@ A container's environment can also be set using `.env` files along with the `env
 
 Connecting two services such as a server and its database in Docker can be achieved with a [Docker network](https://docs.docker.com/engine/network/). In addition to starting services listed in _docker-compose.yml_ Docker Compose automatically creates and joins both containers into a network with a [DNS](https://docs.docker.com/engine/network/#dns-services). Each service is named after the name given in the _docker-compose.yml file_. As such, containers can reference each other simply with their service names, which is different from the container name.
 
-+----------------------------------------------------------------------------------------------------+\
-|                                  docker network: webapp-network                                    |\
-|                                                                                                    |\
-|  +---------------------+                                       \+------------------------------+   |\
-|  |  container: webapp  |    curl http://webapp-helper:3000      |   container: webapp-helper   |   |\
-|  |  +---------------+  |            +-------------+             |   +----------------------+   |   |\
-|  |  |    webapp     |  |            |             |             |   |        webapp        |   |   |\
-|  |  |               o--|------------|---- DNS ----|-------------|-->|                      |   |   |\
-|  |  |  application  |  |            |             |             |   |     helper service   |   |   |\
-|  |  +---------------+  |            +-------------+             |   +----------------------+   |   |\
-|  +---------------------+                                        +------------------------------0+  |\
-|                                                                                                    |\
-+----------------------------------------------------------------------------------------------------+
+<p align="center">
+	<img src="assets/container_network.png" />
+</p>
 
+In the picture we have two services running in a single network: webapp and webapp-helper. The webapp-helper has a server, listening for requests in port 3000, that webapp wants to access. Because they were defined in the same _docker-compose.yml_ file, the access is trivial. Docker Compose has already taken care of creating a network and webapp can simply send a request to webapp-helper:3000, the internal DNS will translate that to the correct access and ports do not have to be published outside of the network.
 
+### 10.1 Manual network definition
 
+In any case, it is also possible to define the network manually in a Docker Compose file. This makes it easy to set up a configuration where containers defined in two different Docker Compose files share a network and can easily interact with each other
 
+A network is defined in _docker-compose.yml_ file as follows:
 
+```bash
+services:
+  db:
+    image: postgres:13.2-alpine
+    networks:
+      - database-network # Name in this Docker Compose file
+
+networks:
+  database-network: # Name in this Docker Compose file
+    name: database-network # Name that will be the actual name of the network
+```
 
 
 
