@@ -4,13 +4,10 @@
 ## Instructions
 
 
-Let us now leverage the Docker Compose with the simple webservice that we used in the Exercise 1.3
-
-Without a command devopsdockeruh/simple-web-service will create logs into its /usr/src/app/text.log.
-
-Create a docker-compose.yml file that starts devopsdockeruh/simple-web-service and saves the logs into your filesystem.
-
-Submit the docker-compose.yml, and make sure that it works simply by running docker compose up if the log file exists.
+Let us now leverage the Docker Compose with the simple webservice that we used in the Exercise 1.3. \
+Without a command `devopsdockeruh/simple-web-service` will create logs into its `/usr/src/app/text.log`.\
+Create a _docker-compose.yml_ file that starts devopsdockeruh/simple-web-service and saves the logs into your filesystem.\
+Submit the _docker-compose.yml_, and make sure that it works simply by running docker compose up if the log file exists.
 
 ---
 
@@ -22,7 +19,7 @@ To ensure the log file exists in the host, I create it in advance (if I don't, D
 
    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`touch text.log`
 
-This is my `docker-compose.yml`:
+This is my _docker-compose.yml`:
 
 ```bash
 services:
