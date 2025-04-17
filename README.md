@@ -557,7 +557,7 @@ Connecting two services such as a server and its database in Docker can be achie
 +----------------------------------------------------------------------------------------------------+\
 |                                  docker network: webapp-network                                    |\
 |                                                                                                    |\
-|  +---------------------+                                        +------------------------------+   |\
+|  +---------------------+                                       \+------------------------------+   |\
 |  |  container: webapp  |    curl http://webapp-helper:3000      |   container: webapp-helper   |   |\
 |  |  +---------------+  |            +-------------+             |   +----------------------+   |   |\
 |  |  |    webapp     |  |            |             |             |   |        webapp        |   |   |\
