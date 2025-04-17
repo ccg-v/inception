@@ -554,18 +554,18 @@ A container's environment can also be set using `.env` files along with the `env
 
 Connecting two services such as a server and its database in Docker can be achieved with a [Docker network](https://docs.docker.com/engine/network/). In addition to starting services listed in _docker-compose.yml_ Docker Compose automatically creates and joins both containers into a network with a [DNS](https://docs.docker.com/engine/network/#dns-services). Each service is named after the name given in the _docker-compose.yml file_. As such, containers can reference each other simply with their service names, which is different from the container name.
 
-+----------------------------------------------------------------------------------------------------+
-|                                  docker network: webapp-network                                    |
-|                                                                                                    |
-|  +---------------------+                                        +------------------------------+   |
-|  |  container: webapp  |    curl http://webapp-helper:3000      |   container: webapp-helper   |   |
-|  |  +---------------+  |            +-------------+             |   +----------------------+   |   |
-|  |  |    webapp     |  |            |             |             |   |        webapp        |   |   |
-|  |  |               o--|------------|---- DNS ----|-------------|-->|                      |   |   |
-|  |  |  application  |  |            |             |             |   |     helper service   |   |   |
-|  |  +---------------+  |            +-------------+             |   +----------------------+   |   |
-|  +---------------------+                                        +------------------------------0+  |
-|                                                                                                    |
++----------------------------------------------------------------------------------------------------+\
+|                                  docker network: webapp-network                                    |\
+|                                                                                                    |\
+|  +---------------------+                                        +------------------------------+   |\
+|  |  container: webapp  |    curl http://webapp-helper:3000      |   container: webapp-helper   |   |\
+|  |  +---------------+  |            +-------------+             |   +----------------------+   |   |\
+|  |  |    webapp     |  |            |             |             |   |        webapp        |   |   |\
+|  |  |               o--|------------|---- DNS ----|-------------|-->|                      |   |   |\
+|  |  |  application  |  |            |             |             |   |     helper service   |   |   |\
+|  |  +---------------+  |            +-------------+             |   +----------------------+   |   |\
+|  +---------------------+                                        +------------------------------0+  |\
+|                                                                                                    |\
 +----------------------------------------------------------------------------------------------------+
 
 
