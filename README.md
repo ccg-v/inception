@@ -452,7 +452,7 @@ In this case, the **bind mount** is telling Docker to _take the current director
 
 ---
 
-## Binding ports in Docker Compose
+## 8.3 Binding ports in Docker Compose
 
 The following example builds a image from 'jwilder/whoami', a simple service that prints the current container id (hostname):
 
@@ -473,9 +473,106 @@ the output confirms that we have just binded host port 8000 to container port 80
 
 ---
 
-## Setting environment variables within container's environment
+## 9.Setting environment variables within container's environment
 
-https://docs.docker.com/compose/how-tos/environment-variables/set-environment-variables/
+When a container is created it has some environment variables by default, but only the ones set by Docker or defined in the image itself, not your custom ones. Let's run a basic container:
+
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker run -it ubuntu printenv`
+
+The `printenv` command displays the bare minimum environment set by Docker and the base image:
+
+```bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+HOSTNAME=ff9bb901f76e
+TERM=xterm
+HOME=/root
+```
+
+Now let's run the container without any command:
+
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker run -it ubuntu`
+
+Docker starts a container and, since we gave no command, runs the default command, which for Ubuntu is `/bin/bash`, an actual shell. That shell reads initialization scripts (like `/etc/profile`, `.bashrc`, etc, depending on the shell and image), and these scripts often set environment variables like `PWD`, `LS_COLORS`, `SHLVL`, `_`. **In any case, none of our custom environment variables is going to be set**.
+
+1. To <ins>**set**</ins> a custom variable:
+
+	- straight from shell to the container:
+
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker run -e VARIABLE=value image-name`
+
+	- from docker compose, using the **environment** attribute:
+
+		```bash
+		services:
+			myapp:
+				image: myapp-image
+				environment:
+					- DEBUG=true
+		```
+		It can also be written with a `key-value map` style:
+
+		```bash
+		environment:
+			DEBUG: "true"
+		```
+
+2. To <ins>**pass**</ins> an existing custom variable:
+
+	- straight from shell to the container:
+
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker run -e VARIABLE image-name`
+
+	- from docker compose, using the **environment** attribute:
+
+		```bash
+		services:
+			myapp:
+				image: myapp-image
+				environment:
+					- DEBUG
+		```
+	   The value of VARIABLE in the container is taken from the value for the same variable in the shell in which Compose is run or from the environment files
+
+A container's environment can also be set using `.env` files along with the `env_file` attribute:
+
+	- from the command line:
+
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker run --env-file myapp.env image-name`
+
+	- from docker compose:
+
+		```bash
+		services:
+			myapp:
+				image: myapp-image
+				env_file: "myapp.env"
+		```
+
+---
+
+## 10. Docker networking
+
+Connecting two services such as a server and its database in Docker can be achieved with a [Docker network](https://docs.docker.com/engine/network/). In addition to starting services listed in _docker-compose.yml_ Docker Compose automatically creates and joins both containers into a network with a [DNS](https://docs.docker.com/engine/network/#dns-services). Each service is named after the name given in the _docker-compose.yml file_. As such, containers can reference each other simply with their service names, which is different from the container name.
+
++----------------------------------------------------------------------------------------------------+
+|                                  docker network: webapp-network                                    |
+|                                                                                                    |
+|  +---------------------+                                        +------------------------------+   |
+|  |  container: webapp  |    curl http://webapp-helper:3000      |   container: webapp-helper   |   |
+|  |  +---------------+  |            +-------------+             |   +----------------------+   |   |
+|  |  |    webapp     |  |            |             |             |   |        webapp        |   |   |
+|  |  |               o--|------------|---- DNS ----|-------------|-->|                      |   |   |
+|  |  |  application  |  |            |             |             |   |     helper service   |   |   |
+|  |  +---------------+  |            +-------------+             |   +----------------------+   |   |
+|  +---------------------+                                        +------------------------------0+  |
+|                                                                                                    |
++----------------------------------------------------------------------------------------------------+
+
+
+
+
+
+
 
 
 
