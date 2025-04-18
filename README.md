@@ -211,7 +211,9 @@ CMD ./hello.sh
 
 To <ins>**build**</ins> the image:
 
-   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker image build . -t hello:bash .`
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker image build . -t hello:bash`
+
+(`-t` option is for setting a tag)
 
 And to run it:
 

@@ -6,9 +6,8 @@
 
 `sudo usermod -aG <groupname> $USER` . Add user to group
 
-
-
 To give superuser privileges:
+
 1. Switch to root user
 2. Add <user_name> to sudo group: `usermod -aG sudo <user_name>`
 3. Check sudoers file: 
