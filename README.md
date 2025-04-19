@@ -147,7 +147,7 @@ In later versions, `docker container prune` command does the same.
 
 We can pull an existing image, run it in a container and modify it as needed. E.g.:
 
-```bash
+```Dockerfile
 docker container run -it ubuntu bash
 apt-get update
 apt-get install -y figlet
@@ -193,7 +193,7 @@ echo "hello from $(hostname)"
 
 To build our image, we will use alpine (an specific version, 3.21) as the base OS image, copy our source code -the script- into the container and specify the default command to be run upon container creation:
 
-```bash
+```Dockerfile
 FROM alpine:3.21
 WORKDIR usr/src/app
 COPY hello.sh .
@@ -392,7 +392,7 @@ Example:
 
 Assume we are in the folder where we have our Dockerfile with the following content:
 
-```bash
+```Dockerfile
 FROM ubuntu:24.04
 WORKDIR /mydir
 RUN apt-get update && apt-get install -y curl python3
@@ -403,7 +403,7 @@ ENTRYPOINT ["/usr/local/bin/yt-dlp"]
 
 Let us now create a file called `docker-compose.yml`:
 
-```bash
+```yaml
 services:
   yt-dlp-ubuntu:
     image: <username>/<repositoryname>
@@ -417,7 +417,7 @@ The file defines:
 
 It is pretty common that we use some readily built images, and in that case, the key `build` is not needed. For instance,
 
-```bash
+```yaml
 services:
   nginx:
     image: nginx:1.27
@@ -438,7 +438,7 @@ services:
 
 Example:
 
-```bash
+```yaml
 services:
   yt-dlp-ubuntu:
     image: <username>/<repositoryname>
@@ -462,7 +462,7 @@ In this case, the **bind mount** is telling Docker to _take the current director
 
 The following example builds a image from 'jwilder/whoami', a simple service that prints the current container id (hostname):
 
-```bash
+```yaml
 services:
   whoami:
     image: jwilder/whoami
@@ -508,7 +508,7 @@ Docker starts a container and, since we gave no command, runs the default comman
 
 	- from docker compose, using the **environment** attribute:
 
-		```bash
+		```yaml
 		services:
 			myapp:
 				image: myapp-image
@@ -517,7 +517,7 @@ Docker starts a container and, since we gave no command, runs the default comman
 		```
 		It can also be written with a `key-value map` style:
 
-		```bash
+		```yaml
 		environment:
 			DEBUG: "true"
 		```
@@ -530,7 +530,7 @@ Docker starts a container and, since we gave no command, runs the default comman
 
 	- from docker compose, using the **environment** attribute:
 
-		```bash
+		```yaml
 		services:
 			myapp:
 				image: myapp-image
@@ -547,7 +547,7 @@ A container's environment can also be set using `.env` files along with the `env
 
 	- from docker compose:
 
-		```bash
+		```yaml
 		services:
 			myapp:
 				image: myapp-image
@@ -572,7 +572,7 @@ In any case, it is also possible to define the network manually in a Docker Comp
 
 A network is defined in _docker-compose.yml_ file as follows:
 
-```bash
+```yaml
 services:				# Top-level key
   db:					# User-defined service identifier (we name this!)
     image: postgres:13.2-alpine		# Docker image (name:tag)
@@ -586,7 +586,7 @@ networks:				# Top-level key
 
 Establishing a <ins>**connection to an external network**</ins> (that is, a network defined in another docker-compose.yml) is done as follows:
 
-```bash
+```yaml
 services:
   app:
     image: myapp
@@ -601,7 +601,7 @@ networks:
 
 If we use the external network name also internally, the Compose file can be simplified:
 
-```bash
+```yaml
 services:
   app:
     image: myapp
