@@ -147,7 +147,7 @@ In later versions, `docker container prune` command does the same.
 
 We can pull an existing image, run it in a container and modify it as needed. E.g.:
 
-```Dockerfile
+```bash
 docker container run -it ubuntu bash
 apt-get update
 apt-get install -y figlet
@@ -306,7 +306,7 @@ When to use Volume mounts:
 	- Scratch space (intermediate calculations, temp files)
 	- High-speed operations (RAM is faster than disk)
 
---tmpfs doesn't take a host path or volume name — it just tells Docker: “Mount a RAM-backed filesystem at this path inside the container.”:
+`--tmpfs` doesn't take a host path or volume name — it just tells Docker: “Mount a RAM-backed filesystem at this path inside the container:
 
    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker run --tmpfs /path/in/container image:tag`
 
@@ -316,7 +316,7 @@ You can even specify size and mount options if needed:
 
 ### 6.4 Docker commands for managing mounts
 
-```bash
+```dockerfile
 //Inspecting Mounts used in a container
 docker inspect [container_id] --format='{{ .Mounts }}'
 
@@ -392,7 +392,7 @@ Example:
 
 Assume we are in the folder where we have our Dockerfile with the following content:
 
-```Dockerfile
+```dockerfile
 FROM ubuntu:24.04
 WORKDIR /mydir
 RUN apt-get update && apt-get install -y curl python3
