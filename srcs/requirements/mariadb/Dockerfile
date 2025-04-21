@@ -1,7 +1,11 @@
 FROM debian:bullseye
 
 RUN apt update -y && apt upgrade -y
+# Run the actual MariaDb server...
 RUN apt install -y mariadb-server
+# ..and also MariaDb client because it provides the mysql CLI tool
+# (we need it to run mysql commands in the configuration script 'init.sh')
+RUN apt install -y mariadb-client
 
 # Create runtime directory MariaDB and set correct ownership
 # RUN mkdir -p /run/mysqld
@@ -12,14 +16,13 @@ RUN chmod 777 /var/run/mysqld
 
 # Custom SQL file to initialize DB/user
 # MariaDB runs it automatically on first container launch
-COPY ./tools/init.sql /docker-entrypoint-initdb.d/
+COPY ./tools/init.sh /usr/local/bin/init.sh
+RUN chmod +x /usr/local/bin/init.sh
+#RUN /usr/local/bin/init.sh
 
 COPY ./config/custom.cnf /etc/mysql/mariadb.conf.d/
 RUN chmod 644 /etc/mysql/mariadb.conf.d/custom.cnf
 
-COPY ./entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-
 # Command to launch MariaDB as the `mysql` user
-# CMD ["mysqld"] 
-ENTRYPOINT ["/entrypoint.sh"]
+#CMD ["/usr/local/bin/init.sh"]
+ENTRYPOINT ["/usr/local/bin/init.sh"]

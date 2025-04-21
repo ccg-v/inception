@@ -174,6 +174,14 @@ If we don't need the image anymore, we can delete it from our system:
 
    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker image rm my_image_name`
 
+Docker provides a single command that will clean up any resources — images, containers, volumes, and networks — that are dangling (not tagged or associated with a container):
+
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker system prune`
+
+To additionally remove any stopped containers and all unused images (not just dangling images), add the `-a` flag to the command:
+
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker system prune -a`
+
 ---------------------------
 
 ## 5. Creating our images using a Dockerfile
@@ -200,14 +208,9 @@ COPY hello.sh .
 RUN chmod +x hello.sh
 CMD ./hello.sh
 ```
-
 > Should our script be written in bash (just change the _shebang_ to `#!/bin/bash`), Alpine would not be able to run it because it does not include by default. In this case, we would have to add a line to our Dockerfile:\
 > &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`RUN apk update && apk add bash`\
 > to install Bash.
-
-> [!NOTE]
-> To pass an argument to command: `CMD["executable", "argument"]`\
-> To wait for argument after execution: `ENTRYPOINT["executable"]`
 
 To <ins>**build**</ins> the image:
 
@@ -226,6 +229,9 @@ Finally, this is our output:
 > [!NOTE]
 > When writing a Dockerfile we should always try to keep the most prone-to-change rows at the bottom, to preserve as much cached-layers as possible and speed up the build process (read more about Docker build cache [here](https://docs.docker.com/build/cache/))
 
+### 5.1 Choosing CMD or ENTRYPOINT to build our image
+
+- `CMD` sets the default command that will be executed when the container runs. But it is important to notice that it can be overriden with any other command the user may pass.
 ---------------------------
 
 ## 6. Mounts: Sharing and keeping persistent data
