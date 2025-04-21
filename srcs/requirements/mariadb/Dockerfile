@@ -1,4 +1,5 @@
 FROM debian:bullseye
+
 RUN apt update -y && apt upgrade -y
 RUN apt install -y mariadb-server
 
@@ -16,5 +17,9 @@ COPY ./tools/init.sql /docker-entrypoint-initdb.d/
 COPY ./config/custom.cnf /etc/mysql/mariadb.conf.d/
 RUN chmod 644 /etc/mysql/mariadb.conf.d/custom.cnf
 
+COPY ./entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
 # Command to launch MariaDB as the `mysql` user
-CMD ["mysqld"] 
+# CMD ["mysqld"] 
+ENTRYPOINT ["/entrypoint.sh"]
