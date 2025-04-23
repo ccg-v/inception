@@ -436,7 +436,37 @@ services:
 > >    nginx:  #**user-defined identifier**\
 > >       image: nginx:1.27 #**Docker object** (_image_) **name** (_nginx_) and **tag** (_1.27_)
 
-## 8.1 Volumes in Docker Compose
+## 8.1 Docker-compose and Dockerfile
+
+This is the connection between both files, visually explained:
+
+╔══════════════════════╗ \
+║______Dockerfile______║  ← Blueprint for an image \
+╚══════════════════════╝ \
+         │ \
+         ▼ \
+╔══════════════════════╗
+║    docker compose    ║  ← Orchestrator of your services
+║     build phase      ║
+╚══════════════════════╝
+         │
+         ▼
+╔══════════════════════╗
+║     Docker Image     ║  ← Built filesystem snapshot with your app, DB, etc.
+╚══════════════════════╝
+         │
+         ▼
+╔══════════════════════╗
+║  docker compose up   ║  ← Start container(s) from image(s)
+╚══════════════════════╝
+         │
+         ▼
+╔══════════════════════╗
+║   Running Container  ║  ← Your app/service running live
+╚══════════════════════╝
+
+
+## 8.2 Volumes in Docker Compose
 
 **Volumes** in Docker compose are defined with the following syntax:
 
@@ -456,15 +486,16 @@ services:
 
 In this case, the **bind mount** is telling Docker to _take the current directory on the host (.), and mount it inside the container at /mydir_.
 
-## 8.2 Key Commands in Docker Compose
+## 8.3 Key Commands in Docker Compose
 
+- `docker compose build`: Builds images from `Dockerfile` instructions defined under `build:` key in the `docker-compose.yml` file
 - `docker compose up`	: Starts all services defined in the Docker compose file
 - `docker compose down`	: Stops and removes the running services
 - `docker compose logs`	: View the logs to monitor the output of the running containers and debug issues
 - `docker compose ps`	: Lists all the services along with their current status
+- `docker compose up --build`: Forces a fresh rebuild before starting containers
 
-
-## 8.3 Binding ports in Docker Compose
+## 8.4 Binding ports in Docker Compose
 
 The following example builds a image from 'jwilder/whoami', a simple service that prints the current container id (hostname):
 
