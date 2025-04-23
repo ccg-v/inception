@@ -440,9 +440,9 @@ services:
 
 This is the connection between both files, visually explained:
 
-╔══════════════════════╗ \
-║______Dockerfile______║  ← Blueprint for an image \
-╚══════════════════════╝ \
+╔══════════╗ \
+║Dockerfile║  ← Blueprint for an image \
+╚══════════╝ \
          │ \
          ▼ \
 ╔══════════════════════╗
