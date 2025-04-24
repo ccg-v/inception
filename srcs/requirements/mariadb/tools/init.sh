@@ -68,3 +68,5 @@ exec mysqld_safe
 # ------------------------------------------------------------------------------
 # [4] `mmysql_admin` is another admin tool (like `mariadb-admin`) that comes from
 #		the MySQL legacy tools. It allows us to gracefully stop the MariaDB server.
+#		Here we have to pass the root server because it has already been set in  
+#		the last SQL statement.
