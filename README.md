@@ -308,6 +308,15 @@ When to use Volume mounts:
 - Changing or Applying New Configuration Files
 - Backup and Restore
 
+**Volume-related commands:**
+
+- `docker volume ls` : lists the current mounted volumes
+- `docker volume inspect <volume_name>` : displays full details about <volume_name>: creation date, driver, labels, mountpoint...
+
+Docker Compose automatially prefixes volume names with the project name, which is by default the name of the root directory containing the `docker-compose.yml` file. If root folder is <srcs> and volume in `docker-compose.yml` file is `mariadb-data`, Docker Compose will name the volume as `srcs_mariadb-data`. To override this prefix with a custom project name, run:
+- `docker-compose -p my project up`
+
+
 ### 6.3 tmpfs: Fast but volatile
 
 **tmpfs** (_Temporary File System_) is a Linux kernel feature, a type of filesystem that resides entirely in volatile memory (RAM), not on disk. Consequently,
@@ -447,7 +456,10 @@ services:
 - `docker-compose.yml` describes how to run and connect containers, based on images (Analogy: _complete chef's instruction sheet_)
 
 	- `docker compose build` triggers the image creation process (Analogy: _baking the cake from the recipe_)
-	- `docker compose up` starts containers from those images, creating the actual running services (Analogy: _serving the cake_)
+	- `docker compose up` starts containers from those images, creating the actual running services (Analogy: _serving the cake_): 
+		+ Builds the image(s) (if not already built or if changes are detected in the Dockerfile)
+		+ Creates containers from the image(s)
+		+ Starts the container processes in the foreground (unless you add `-d` flag for detached)
 
 How `ENTRYPOINT`, `CMD` and **environment variables** come into play during runtime:
 
