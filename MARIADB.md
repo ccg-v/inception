@@ -81,3 +81,82 @@ COPY ./tools/init.sql /docker-entrypoint-initdb.d/
 # Command to launch MariaDB as the `mysql` user
 CMD ["mysqld"] 
 ```
+
+------
+# Setting database environment variables
+
+1. Defining them in environment key within docker-compose.yml:
+
+    - **These are runtime environment variables**.
+    - They’re passed to the container when it starts, not when it's being built.
+
+		_docker-compose.yml_:
+		```yaml
+		services:
+		   mariadb:
+		      environment:
+			    - MYSQL_DATABASE: wordpress
+				- ...
+		```
+
+    - That’s why they work in init.sh script when it runs as part of ENTRYPOINT or CMD.
+
+		_init.sh_:
+		```bash
+		mariadb -u root -e "CREATE DATABASE IF NOT EXISTS $MYSQL_DATABASE;"
+		...
+		```
+	 + Used when you want to pass runtime config to your app, scripts, or services.
+	 + ✔️ Simple and standard
+	 + ✔️ Clear separation of concerns (build vs. runtime)
+	 + ✔️ Best practice - what official images (like MySQL, WordPress) expect
+
+	 - The variables can also be defined in an `.env` file
+
+		_.env_:
+		```
+		MYSQL_DATABASE=wordpress
+		MYSQL_USER=wpuser
+		```
+		And then in `docker-compose.yml`, just use:
+
+		_docker-compose.yml_:
+		```yaml
+		services:
+		   mariadb:
+		      environment:
+			    - MYSQL_DATABASE: ${MYSQL_DATABASE}
+				- ...
+		```
+		+ ✔️ Keeps secrets and config outside `docker-compose.yml`
+		+ ✔️ Good for sharing values across multiple Compose files (**just don't commit secrets!**)
+
+2. Defining them in build.args in docker-compose.yml:
+
+    - **These are build-time arguments**.
+    - Used to pass values into the Dockerfile via ARG declarations:
+
+		_docker-compose.yml_:
+		```yml
+		services:
+		   mariadb:
+		      build:
+		         context: ./requirements/mariadb
+		         args:
+		            - MYSQL_DATABASE=wordpress
+	                - ...
+		```
+
+    - <ins>Only available during docker build, not at runtime unless you explicitly promote `ARG` to `ENV`</ins>:
+
+		_Dockerfile_:
+		```Dockerfile
+		FROM debian:bullseye
+		ARG MYSQL_DATABASE
+		ENV MYSQL_DATABASE=$MYSQL_DATABASE
+		...
+		```
+		+ ✔️ Used when you’re building a one-off image that always expects the same config baked in.
+		+ ✘✘✘ Not promoting to env and starting MariaDB manually during build:
+			- Breaks layering philosophy (build should not rely on service startup)
+			- Super hacky and unreliable

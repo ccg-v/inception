@@ -182,6 +182,10 @@ To additionally remove any stopped containers and all unused images (not just da
 
    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker system prune -a`
 
+Full reset (no cache, no images, no containers, no volumes):
+
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker system prune -a --volumes`
+
 ---------------------------
 
 ## 5. Creating our images using a Dockerfile
@@ -438,33 +442,60 @@ services:
 
 ## 8.1 Docker-compose and Dockerfile
 
-This is the connection between both files, visually explained:
+- `Dockerfile` describes how to build an image: software, packages, configs, etc. (Analogy: _It's like a baking recipe_)
+- `docker-compose.yml` describes how to run and connect containers, based on images (Analogy: _complete chef's instruction sheet_)
 
-╔════════════════╗ \
-║&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Dockerfile&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;║  ← Blueprint for an image \
-╚════════════════╝ \
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| \
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▼ \
-╔════════════════╗ \
-║&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;docker compose&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;║  ← Orchestrator of your services \
-║&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;build phase&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;║ \
-╚════════════════╝ \
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| \
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▼ \
-╔════════════════╗ \
-║&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Docker Image&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;║  ← Built filesystem snapshot with your app, DB, etc. \
-╚════════════════╝ \
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| \
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▼ \
-╔════════════════╗ \
-║&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;docker compose up&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;║  ← Start container(s) from image(s) \
-╚════════════════╝ \
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| \
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▼ \
-╔════════════════╗ \
-║&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Running Container&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;║  ← Your app/service running live \
-╚════════════════╝ 
+	- `docker compose build` triggers the image creation process (Analogy: _baking the cake from the recipe_)
+	- `docker compose up` starts containers from those images, creating the actual running services (Analogy: _serving the cake_)
 
+How `ENTRYPOINT`, `CMD` and **environment variables** come into play during runtime:
+
+		```
+		Dockerfile
+		|-- `ENTRYPOINT` ["myscript.sh"]  ← default command
+		|-- `CMD` ["arg1", "arg2"]  ← default arguments 
+		```
+
+		```
+		docker-compose.yml
+		|-- environment:
+		|      MYSQL_USER: wpuser
+		|-- command: ["custom-arg"]  ← replaces `CMD` only
+		|-- entrypoint: ["other.sh"]  ← overrides `ENTRYPOINT
+		```
+Example:
+
+- Dockerfile
+
+	```yaml
+	ENTRYPOINT ["myscript.sh"]
+	CMD ["arg1", "arg2"]
+	```
+	This means when the container starts, it will run `myscript.sh arg1 arg2`
+
+- docker-compose.yml
+
+	```yaml
+	services:
+  		myservice:
+    		build: .
+    		command: ["custom-arg"]
+	```
+	This will result in `myscript.sh custom-arg`:
+	 - **ENTRYPOINT is preserved**
+	 - **CMD is overriden**
+
+	But, if we do:
+
+	```yml
+	services:
+  		myservice:
+    		build: .
+    		entrypoint: ["other.sh"]
+    		command: ["foo"]
+	```
+	This will result in `other.sh foo`:
+	 - **Both ENTRYPOINT and CMD are overriden**
 
 ## 8.2 Volumes in Docker Compose
 
@@ -493,7 +524,8 @@ In this case, the **bind mount** is telling Docker to _take the current director
 - `docker compose down`	: Stops and removes the running services
 - `docker compose logs`	: View the logs to monitor the output of the running containers and debug issues
 - `docker compose ps`	: Lists all the services along with their current status
-- `docker compose up --build`: Forces a fresh rebuild before starting containers
+- `docker compose up --build`: Forces a fresh rebuild before starting containers, **but reuse cached layers when possible**
+- `docker-compose build --no-cache`: Completely disable the cache and force a clean rebuild
 
 ## 8.4 Binding ports in Docker Compose
 
