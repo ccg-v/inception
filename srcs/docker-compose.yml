@@ -3,7 +3,7 @@ services:
     container_name: mariadb
     build:
       context: ./requirements/mariadb
-    image: mariadb:inception
+    image: mariadb:inception # image tagging
     environment:
       MYSQL_ROOT_PASSWORD: rtpass
       MYSQL_DATABASE: wordpress
@@ -11,6 +11,29 @@ services:
       MYSQL_PASSWORD: wppass
     volumes:
       - mariadb_data:/var/lib/mysql
+    networks:
+      - inception # ?
+
+  wordpress:
+    container_name: wordpress
+    build:
+      context: ./requirements/wordpress
+    image: wordpress:inception # image tagging
+    environment:
+      - WORDPRESS_DB_HOST=mariadb:3306 # ?
+      - WORDPRESS_DB_NAME=${MYSQL_DATABASE}
+      - WORDPRESS_DB_USER=${MYSQL_USER}
+      - WORDPRESS_DB_PASSWORD=${MYSQL_PASSWORD}
+    depends_on:
+      - mariadb # ?
+    networks:
+      - inception # ?
+    volumes:
+      - wordpress_data:/var/www/html
 
 volumes:
   mariadb_data:
+  wordpress_data: # ?
+
+networks:
+  inception:

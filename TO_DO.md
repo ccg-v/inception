@@ -1,3 +1,19 @@
+Check bookmarks!!!
+
+# docker-compose
+service:
+	<service_name>
+		init: true
+		build:
+			dockerfile: Dockerfile
+		env_file:	.env
+		restart: (always)(on-failure)// The volume?
+
+
+- network?
+- volumes: Set name? External? Driver?
+
+
 # MariaDB:
 
 Xplanations:
