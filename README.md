@@ -182,7 +182,8 @@ To additionally remove any stopped containers and all unused images (not just da
 
    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker system prune -a`
 
-Full reset (no cache, no images, no containers, no volumes):
+[!Caution]
+Full reset (no cache, no images, no containers, no volumes). But be careful if you are working on multiple things, because the command  will wipe volumes/images from all projects!
 
    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`docker system prune -a --volumes`
 
