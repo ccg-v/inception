@@ -9,8 +9,8 @@ services:
       MYSQL_DATABASE: wordpress
       MYSQL_USER: wpuser
       MYSQL_PASSWORD: wppass
-#    volumes:
-#      - mariadb_data:/var/lib/mysql
+    volumes:
+      - mariadb_data:/var/lib/mysql
 
-#volumes:
-#  mariadb_data:
+volumes:
+  mariadb_data:

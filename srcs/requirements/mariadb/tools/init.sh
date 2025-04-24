@@ -14,21 +14,14 @@ done
 
 echo "✅ MariaDB is ready, continuing setup..."
 
-# Debugging: Output the environment variables to confirm they're set
-echo "MYSQL_DATABASE: $MYSQL_DATABASE"
-echo "MYSQL_USER: $MYSQL_USER"
-echo "MYSQL_PASSWORD: $MYSQL_PASSWORD"
-echo "MYSQL_ROOT_PASSWORD: $MYSQL_ROOT_PASSWORD"
-sleep 2
-
-# Set up the database and user
-mariadb -u root -p"$MYSQL_ROOT_PASSWORD" -e "CREATE DATABASE IF NOT EXISTS $MYSQL_DATABASE;"
-mariadb -u root -p"$MYSQL_ROOT_PASSWORD" -e "CREATE USER IF NOT EXISTS '$MYSQL_USER'@'%' IDENTIFIED BY '$MYSQL_PASSWORD';"
-mariadb -u root -p"$MYSQL_ROOT_PASSWORD" -e "GRANT ALL PRIVILEGES ON $MYSQL_DATABASE.* TO '$MYSQL_USER'@'%';"
-mariadb -u root -p"$MYSQL_ROOT_PASSWORD" -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '$MYSQL_ROOT_PASSWORD';"
-mariadb -u root -p"$MYSQL_ROOT_PASSWORD" -e "FLUSH PRIVILEGES;"
-mysqladmin -u root -p"$MYSQL_ROOT_PASSWORD" shutdown
-
+# Set up the database and user (using a here-document to avoid having to type authentication repeatedly in every line)
+mariadb -u root -p"${MYSQL_ROOT_PASSWORD}" <<EOF
+CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\`;
+CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';
+GRANT ALL PRIVILEGES ON \`${MYSQL_DATABASE}\`.* TO '${MYSQL_USER}'@'%';
+ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
+FLUSH PRIVILEGES;
+EOF
 
 # Stop temporary MariaDB instance
 mysqladmin -u root -p"$MYSQL_ROOT_PASSWORD" shutdown
