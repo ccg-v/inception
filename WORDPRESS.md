@@ -29,7 +29,9 @@ RUN curl -O https://wordpress.org/latest.tar.gz && \
 WORKDIR /var/www/html
 
 # Expose port (you might proxy through nginx later)
-EXPOSE 9000
+# Not needed except for documentation purposes 
+# (see footnote[1] in docker-compose.yml about `ports: "443:443"`)
+# EXPOSE 9000
 
 CMD ["php-fpm7.3", "-F"]
 ```

@@ -25,9 +25,6 @@ RUN chmod +x /usr/local/bin/setup.sh
 # Set working directory
 WORKDIR /var/www/html
 
-# Expose port
-EXPOSE 9000
-
 # Start php-fpm in the foreground --> moved to the wordpress script in wordpress/tools/setup.sh
 # If we run the script during 'RUN bash /usr/local/bin/setup.sh', the wp-config.php file will be 
 # created with all our environment variables because the container hasn't started yet and those 
@@ -61,37 +58,37 @@ CMD ["bash", "/usr/local/bin/setup.sh"]
 
 # PHP is a programming language, mainly used for server-side web development.
 #
-# `php7.4`
+# 	`php7.4`
 #
-# Installs the interpreter, i.e the main program that reads and executes .php files.
-# With just this package, you can already run small PHP scripts from the command  
-# line or embedded in HTML (but no integration with databases or web servers yet).
+# 	Installs the interpreter, i.e the main program that reads and executes .php files.
+# 	With just this package, you can already run small PHP scripts from the command  
+# 	line or embedded in HTML (but no integration with databases or web servers yet).
 # 
-# `php7.4-mysql`
+# 	`php7.4-mysql`
 #
-# Adds the necessary functions inside PHP so you can connect to MySQL/MariaDB databases,  
-# run queries, fetch results, etc.
+# 	Adds the necessary functions inside PHP so you can connect to MySQL/MariaDB databases,  
+# 	run queries, fetch results, etc.
 #
-# `php7.4-pfm`
+# 	`php7.4-pfm`
 #
-# This installs the PHP-FPM service ("FastCGI Process Manager").
-# - PHP-FPM is a server dedicated to running PHP scripts.
-# - It listens either on a TCP port (like 9000) or a Unix socket.
-# - It accepts requests from a web server (like NGINX) and returns the generated HTML output.
-# - It is much faster and more scalable than the old method (Apache mod_php) because it 
+# 	This installs the PHP-FPM service ("FastCGI Process Manager").
+# 	- PHP-FPM is a server dedicated to running PHP scripts.
+# 	- It listens either on a TCP port (like 9000) or a Unix socket.
+# 	- It accepts requests from a web server (like NGINX) and returns the generated HTML output.
+# 	- It is much faster and more scalable than the old method (Apache mod_php) because it 
 #		manages PHP processes independently.
-# Example of communication: Browser ➔ NGINX ➔ PHP-FPM ➔ WordPress PHP code ➔ Database
-# Without php7.4-fpm, NGINX wouldn't know how to process PHP files — it would only serve 
-# static files (HTML, images...).
+# 	Example of communication: Browser ➔ NGINX ➔ PHP-FPM ➔ WordPress PHP code ➔ Database
+# 	Without php7.4-fpm, NGINX wouldn't know how to process PHP files — it would only serve 
+# 	static files (HTML, images...).
 #
-# PHP-FPM is a server-side helper that processes PHP code for webservers like NGINX.
-# NGINX cannot execute PHP code by itself, it can only serve static files (like .html, .jpg, .css).
-# When NGINX sees a request for a .php file (like index.php in WordPress), it forwards that request to PHP-FPM.
-# PHP-FPM reads the PHP code, runs it, and returns the generated HTML to NGINX.
-# Then NGINX sends the final HTML to the user's browser.
-# Without PHP-FPM:
-# - NGINX would download the .php files as if they were static files — like downloading a .txt file.
-# - NO execution of PHP would happen.
-# Without NGINX:
-# - PHP-FPM alone wouldn't know how to "talk to the outside world" (it just listens internally).
-# - You would have no web access unless you manually configured something crazy.
+# 	PHP-FPM is a server-side helper that processes PHP code for webservers like NGINX.
+# 	NGINX cannot execute PHP code by itself, it can only serve static files (like .html, .jpg, .css).
+# 	When NGINX sees a request for a .php file (like index.php in WordPress), it forwards that request to PHP-FPM.
+# 	PHP-FPM reads the PHP code, runs it, and returns the generated HTML to NGINX.
+# 	Then NGINX sends the final HTML to the user's browser.
+# 	Without PHP-FPM:
+# 		- NGINX would download the .php files as if they were static files (like downloading a .txt file).
+# 		- NO execution of PHP would happen.
+# 	Without NGINX:
+# 		- PHP-FPM alone wouldn't know how to "talk to the outside world" (it just listens internally).
+# 		- You would have no web access unless you manually configured something crazy.

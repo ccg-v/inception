@@ -70,9 +70,6 @@ RUN openssl req -newkey rsa:4096 -x509 -sha256 -days 365 -nodes \
   -keyout /etc/ssl/private/yourdomain.key \
   -subj "/C=XX/ST=City/L=City/O=42School/OU=Inception/CN=yourdomain.com"
 
-# Copy SSL certificates (WHY?)
-COPY ssl/yourdomain.crt /etc/ssl/certs/yourdomain.crt 
-COPY ssl/yourdomain.key /etc/ssl/private/yourdomain.key
 # Set proper permissions
 RUN chmod 644 /etc/ssl/certs/yourdomain.crt \
     && chmod 600 /etc/ssl/private/yourdomain.key
@@ -80,15 +77,11 @@ RUN chmod 644 /etc/ssl/certs/yourdomain.crt \
 # Copy our custom nginx configuration
 COPY ./conf/nginx.conf /etc/nginx/nginx.conf
 
-# Expose the ports for HTTP and HTTPS???
-EXPOSE 80 443
+# Expose port 443 for HTTPS
+EXPOSE 443
 
 # Start nginx (in foreground mode!)
 CMD ["nginx", "-g", "daemon off;"]
-```
-```Dockerfile
-# Expose port 443 for HTTPS
-EXPOSE 443
 ```
 
 2. `/var/www/html` folder is the default web root for NGINX. NGINX serves files (HTML, PHP, etc.) from /var/www/html by default, unless otherwise specified in your nginx.conf.

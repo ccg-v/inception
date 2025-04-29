@@ -5,37 +5,89 @@ services:
     build:
       context: ./requirements/mariadb
     env_file: .env
-#    environment:
-#      MYSQL_ROOT_PASSWORD: rtpass
-#      MYSQL_DATABASE: wordpress
-#      MYSQL_USER: wpuser
-#      MYSQL_PASSWORD: wppass
     volumes:
       - mariadb_data:/var/lib/mysql
     networks:
-      - inception # ????? Cal?
+      - inception
+    restart: unless-stopped
+
 
   wordpress:
     container_name: wordpress
-    image: wordpress:inception # image tagging
+    image: wordpress:inception
     build:
       context: ./requirements/wordpress
     env_file: .env
     depends_on:
-      - mariadb # ?
-#    environment:
-#      - WORDPRESS_DB_HOST=mariadb:3306 # Tells WordPress where to find MariaDB database. If not set WP by default looks for it in localhost
-#      - WORDPRESS_DB_NAME=${MYSQL_DATABASE}
-#      - WORDPRESS_DB_USER=${MYSQL_USER}
-#      - WORDPRESS_DB_PASSWORD=${MYSQL_PASSWORD}
-    networks:
-      - inception # ????? Cal?
+      - mariadb
     volumes:
       - wordpress_data:/var/www/html
+    networks:
+      - inception
+    restart: unless-stopped
+
+  nginx:
+    container_name: nginx
+    image: nginx:inception
+    build:
+      context: ./requirements/nginx
+    env_file: .env
+    volumes:
+      - nginx_data:/var/www/html
+    ports:
+      - "443:443" # [1]
+    networks:
+      - inception
+    restart: unless-stopped
 
 volumes:
   mariadb_data:
-  wordpress_data: # ?
+    name: mariadb_data
+  wordpress_data:
+    name: wordpress_data
+  nginx_data:
+    name: nginx_data
 
 networks:
   inception:
+
+# [1] ports: "443:443"
+#
+#     This maps a container port to our host machine, making it externally
+#     accessible. NGINX is our public-facing entry point, thus it must be 
+#     reachable from outside the Docker network.
+#     We don't need to EXPOSE ports for MariaDB and WordPress because these
+#     services are only accessed internally within the Docker network (that
+#     we called 'inception'). Docker Compose automatically exposes all 
+#     container ports to other containers on the same network, without ports:.
+#     Adding `EXPOSE <port_number>` to Wordpress or MariaDB Dockerfiles can be
+#     done but is purely declarative (a hint or documentation) but it does not
+#     expose a port to the host or affect container behaviour. Real exposure
+#     only happens when you define `ports:` in `docker-compose.yml` file.
+#     
+#     Services listen on their standard/default ports:
+#       - MariaDB listens by default on port 3306
+#       - PHP-FPM (used by WordPress) listens by default on port 9000 (if
+#         configured that way)
+#
+#     Docker Compose networking handles DNS resolution:
+#       - Each service is accessible from others by its service name 
+#       - You don't need to know the IP, Docker does the internal DNS routing
+#
+#     So how do they "know" where to connect?
+#       - NGINX ↔ WordPress:
+#           In `nginx.conf`, we specify:
+#               `fastcgi_pass wordpress:9000;`
+#           That tells NGINX:
+#             “Send PHP requests to a service named wordpress, port 9000.”
+#           Since wordpress is the Docker Compose service name, and the container 
+#           is listening on 9000, this works smoothly.
+#
+#       -  WordPress ↔ MariaDB:
+#           In the `.env` file, we define a variable:
+#             `WORDPRESS_DB_HOST=mariadb:3306`
+#           In the WordPress setup script we inject the value from `.env` into the
+#           real config (copied from a default template):
+#               `sed -i "s/localhost/${WORDPRESS_DB_HOST}/" /var/www/html/wp-config.php`
+#           Again, Docker resolves mariadb to the correct container, and MariaDB
+#           listens on 3306 by default.
