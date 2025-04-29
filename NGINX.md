@@ -52,25 +52,55 @@ When a user opens our WordPress site, the flow will be:
 FROM debian:bullseye
 
 # Install Nginx
-RUN apt-get update && apt-get install -y nginx && apt-get clean
+RUN apt-get update \
+	&& apt-get install -y nginx openssl \
+	&& apt-get clean \
+	&& rm -rf /var/lib/apt/lists/*
+
+# 2. Create default web root for NGINX
+RUN mkdir -p /var/www/html
+
+# Create SSL folders if they don't exist
+# (standard Linux locations inside nginx container's Linux small file system)
+RUN mkdir -p /etc/ssl/certs /etc/ssl/private
+
+# Generate SSL key and certificate
+RUN openssl req -newkey rsa:4096 -x509 -sha256 -days 365 -nodes \
+  -out /etc/ssl/certs/yourdomain.crt \
+  -keyout /etc/ssl/private/yourdomain.key \
+  -subj "/C=XX/ST=City/L=City/O=42School/OU=Inception/CN=yourdomain.com"
+
+# Copy SSL certificates (WHY?)
+COPY ssl/yourdomain.crt /etc/ssl/certs/yourdomain.crt 
+COPY ssl/yourdomain.key /etc/ssl/private/yourdomain.key
+# Set proper permissions
+RUN chmod 644 /etc/ssl/certs/yourdomain.crt \
+    && chmod 600 /etc/ssl/private/yourdomain.key
 
 # Copy our custom nginx configuration
 COPY ./conf/nginx.conf /etc/nginx/nginx.conf
 
-# Create folders if needed
-RUN mkdir -p /var/www/html
-
-# Expose the ports
+# Expose the ports for HTTP and HTTPS???
 EXPOSE 80 443
 
 # Start nginx (in foreground mode!)
 CMD ["nginx", "-g", "daemon off;"]
-
 ```
+```Dockerfile
+# Expose port 443 for HTTPS
+EXPOSE 443
+```
+
+2. `/var/www/html` folder is the default web root for NGINX. NGINX serves files (HTML, PHP, etc.) from /var/www/html by default, unless otherwise specified in your nginx.conf.
+	We need it if:
+	- We are serving static content (like HTML files), or
+	- We are proxying to something like PHP-FPM which expects the root there. \
+We don't need it:
+	- Our custom `nginx.conf` sets a different root and we are not using this path at all.
 
 ### 4.2 Configuration file logical structure
 
-The `nginx.conf` file is not written in a general-purpose programming language like Python, C or PHP. Instead, it is written in **Nginx configuration syntax**, i.e. a custom configuration language specifically invented for Nginx.
+The `nginx.conf` file is not written in a general-purpose programming language like Python, C or PHP. Instead, it is written in **Nginx configuration syntax**, that is, a custom configuration language specifically invented for Nginx.
 
 It has these characteristics:
 
@@ -136,6 +166,68 @@ http {
 - The `fastcgi_pass` connects Nginx to PHP-FPM service to execute PHP code.
 
 > [!NOTE]
-> - **Certificates**: We must create or generate `my_cert.pem` and `my_key.pem` and put them inside the container.
+> - **Certificates**: We must create or generate a **certificate** (`.crt`) and a **private key** (`.key`) and put them inside the container.
 > - **wordpress:9000**: wordpress must match the service name in the `docker-compose.yml`.
 > - **443**: Port 443 is the standard port for HTTPS (SSL/TLS).
+
+## 4. TSL/SSL settings
+
+https://www.globalsign.com/es/centro-de-informacion-ssl/que-es-un-certificado-ssl
+https://en.wikipedia.org/wiki/Public_key_certificate
+
+SSL certificates prove two things to users:
+- Identity → "I am really who I claim to be."
+- Encryption → "We are talking in secret, no one else can spy on us."
+
+**TLS (HTTPS encryption) requires a certificate (.crt) and a private key (.key).**
+
+**Certificate (CRT file)**: Public file shared with clients (browser downloads it).
+**Private key (KEY file)**: Secret file kept on the server only.
+Together, they allow encrypted communication.
+
+In the real world, big websites pay "Certificate Authorities" (like GlobalSign, Let's Encrypt, Google Trust, etc.) to issue certificates — official certificates trusted by browsers.
+In our Docker project, we generate our own fake certificate, signed by ourselves ("self-signed certificate").It's good enough for local tests.
+Browsers will give a security warning ("not trusted"), but it's fine for our 42 project.
+
+Reminder:
+- Always separate certificates and keys.
+- Always put private keys under `/etc/ssl/private/`, not with public certs.
+- Permissions: Make sure later the key files aren't world-readable (only Nginx user needs access).
+- Name files clearly.
+
+**We must disable old versions (like TLS 1.0 and TLS 1.1) — only allow TLS 1.2 and TLS 1.3.**
+
+OpenSSL command:
+```Dockerfile
+openssl req -x509 -sha256 -nodes \
+  -newkey rsa:4096 \
+  -days 365 \
+  -subj "/C=FR/ST=Paris/L=Paris/O=42/OU=ccarrace/CN=ccarrace.42.fr" \
+  -keyout ${CERTS_KEY} \
+  -out ${CERTS_CRT} 
+```
+
+- `openssl`	The tool for crypto stuff (encrypt, certificates, etc.)
+- `req`		Means: "create a Certificate Signing Request (CSR)" (and a certificate if combined with -x509)
+- `-x509`	Instead of a CSR, create a self-signed X.509 certificate directly
+- `-sha256`	Use strong SHA-256 hashing (modern standard)
+- `-nodes`	No DES encryption on private key = key isn't password protected (needed for Nginx)
+- `-newkey rsa:4096`	Create a brand-new RSA private key of 4096 bits (stronger security)
+- `-days 365`	Certificate valid for 1 year
+- `-subj`	Pre-fill all the organization info to avoid interactive questions
+	+ `/C=`	Country code (e.g., FR, BR, US)
+	+ `/ST=`	State or region
+	+ `/L=`	Locality (City)
+	+ `/O=`	Organization (put "42School" or "42")
+	+ `/OU=`	Organizational Unit (e.g., "Inception")
+	+ `/CN=`	Common Name → The domain name users will visit (e.g., your login .42.fr)
+- `-keyout`	Where to save the private key
+- `-out`	Where to save the public certificate 
+
+
+
+
+- **TLS (HTTPS encryption) requires a certificate (.crt) and a private key (.key).**
+- **Nginx must listen on port 443 for HTTPS.**
+- **We must disable old versions (like TLS 1.0 and TLS 1.1) — only allow TLS 1.2 and TLS 1.3.**
+- **PHP-FPM will run separately, so Nginx will proxy PHP requests to PHP-FPM through the socket or a TCP port (in our case, localhost:9000 inside Docker).**
