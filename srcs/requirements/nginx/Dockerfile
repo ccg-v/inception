@@ -20,8 +20,8 @@ RUN openssl req -newkey rsa:4096 -x509 -sha256 -days 365 -nodes \
   -subj "/C=SP/ST=CAT/L=barcelona/O=42/OU=42barcelona/CN=ccarrace.42.fr"
 
 # Set proper permissions
-RUN chmod 644 /etc/ssl/certs/yourdomain.crt \
-    && chmod 600 /etc/ssl/private/yourdomain.key
+RUN chmod 644 /etc/ssl/certs/ccarrace.crt \
+    && chmod 600 /etc/ssl/private/ccarrace.key
 
 # Copy our custom nginx configuration
 COPY ./conf/nginx.conf /etc/nginx/nginx.conf
@@ -37,4 +37,3 @@ CMD ["nginx", "-g", "daemon off;"]
 #			their dowloaded dependencies from `var/cache/apt/archives`
 #		- `rm -rf /var/lib/apt/lists/*` deletes APT package lists that were 
 #			downloaded during apt-get update
-

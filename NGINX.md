@@ -158,6 +158,43 @@ http {
 - `ssl_protocols TLSv1.2 TLSv1.3;` → accept only secure versions of TLS.
 - The `fastcgi_pass` connects Nginx to PHP-FPM service to execute PHP code.
 
+> ### Locations: Nginx request handling order
+> NGINX evaluates `location` blocks in this order (simplified): 
+> - **Exact match** (`location = /about`)
+> - **Prefix match (longest)** (`location /static/`): among all prefix matches, the longest path wins
+> - **Regex match** (`location ~ \.php$`) or `location ~* \.JPG$`: only considered _after_ prefix matches
+> - If none of the above match, Nginx falls back to serving static files under `root` and applying index `index.php`
+> This is why `location /` (a general prefix) often acts as a fallback, but will _not_ override a longer prefix like `location /static/` or a regex.
+> Example:
+> ```nginx
+> server {
+>    root /var/www/html;
+>    index index.php;
+>
+>    location = /about {
+>        return 200 "About page";
+>    }
+>
+>    location /blog/ {
+>        # WordPress or static blog files
+>    }
+>
+>    location ~ \.php$ {
+>        # PHP handler
+>    }
+>
+>    location / {
+>        try_files $uri $uri/ =404;
+>    }
+> }
+> ```
+> Request path: `/blog/post1`
+> 1. Not an exact match (=), so rule #1 is skipped.
+> 2. Prefix /blog/ matches — rule #2 wins here.
+> 3. Regex is ignored because a stronger prefix match already won.
+> 4. The file is looked up under /var/www/html/blog/post1, or internally passed to PHP, depending on logic inside that location.
+
+
 > [!NOTE]
 > - **Certificates**: We must create or generate a **certificate** (`.crt`) and a **private key** (`.key`) and put them inside the container.
 > - **wordpress:9000**: wordpress must match the service name in the `docker-compose.yml`.
@@ -169,8 +206,8 @@ https://www.globalsign.com/es/centro-de-informacion-ssl/que-es-un-certificado-ss
 https://en.wikipedia.org/wiki/Public_key_certificate
 
 SSL certificates prove two things to users:
-- Identity → "I am really who I claim to be."
-- Encryption → "We are talking in secret, no one else can spy on us."
+- Identity → _"I am really who I claim to be."_
+- Encryption → _"We are talking in secret, no one else can spy on us."_
 
 **TLS (HTTPS encryption) requires a certificate (.crt) and a private key (.key).**
 

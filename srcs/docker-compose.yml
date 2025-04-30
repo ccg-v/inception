@@ -33,9 +33,9 @@ services:
       context: ./requirements/nginx
     env_file: .env
     volumes:
-      - nginx_data:/var/www/html
+      - wordpress_data:/var/www/html:ro # [1] 
     ports:
-      - "443:443" # [1]
+      - "443:443" # [2]
     networks:
       - inception
     restart: unless-stopped
@@ -45,13 +45,19 @@ volumes:
     name: mariadb_data
   wordpress_data:
     name: wordpress_data
-  nginx_data:
-    name: nginx_data
 
 networks:
   inception:
 
-# [1] ports: "443:443"
+# [1] `:ro`
+#
+#     Read-only mode. We are telling Docker to mount this volume in the 
+#     container but disallow writing to it. It is a good practice because
+#     - Nginx is just serving static files, so it does not need to write
+#     - This prevents accidental or malicious changes to WordPres content
+#       from the Nginx container. 
+# ------------------------------------------------------------------------------
+# [2] ports: "443:443"
 #
 #     This maps a container port to our host machine, making it externally
 #     accessible. NGINX is our public-facing entry point, thus it must be 
