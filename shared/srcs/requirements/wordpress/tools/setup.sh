@@ -22,4 +22,4 @@ sed -i "s/password_here/${MYSQL_PASSWORD}/" /var/www/html/wp-config.php
 sed -i "s/localhost/${WORDPRESS_DB_HOST}/" /var/www/html/wp-config.php
 
 # Start php-fpm in the foreground
-exec /usr/sbin/php-fpm7.4 -F
+exec php-fpm7.4 -F

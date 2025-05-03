@@ -18,6 +18,8 @@ RUN chmod +x /usr/local/bin/init.sh
 COPY ./config/custom.cnf /etc/mysql/mariadb.conf.d/
 RUN chmod 644 /etc/mysql/mariadb.conf.d/custom.cnf
 
+EXPOSE 3306
+
 # Command to launch MariaDB as the `mysql` user
 #CMD ["/usr/local/bin/init.sh"]
 RUN ls -l /usr/local/bin/init.sh && head -n 10 /usr/local/bin/init.sh

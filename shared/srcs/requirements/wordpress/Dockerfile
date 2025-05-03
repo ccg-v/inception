@@ -24,6 +24,8 @@ RUN chmod +x /usr/local/bin/setup.sh
 # Set working directory
 WORKDIR /var/www/html
 
+EXPOSE 9000
+
 # Start php-fpm in the foreground --> moved to the wordpress script in wordpress/tools/setup.sh
 # If we run the script during 'RUN bash /usr/local/bin/setup.sh', the wp-config.php file will be 
 # created with all our environment variables because the container hasn't started yet and those 

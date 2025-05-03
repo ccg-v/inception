@@ -2,7 +2,7 @@ FROM debian:bullseye
 
 # Install nginx and openssl, remove installation files [1]
 RUN apt-get update \
-	&& apt-get install -y nginx openssl \
+	&& apt-get install -y nginx openssl netcat \
 	&& apt-get clean \
 	&& rm -rf /var/lib/apt/lists/*
 
@@ -26,8 +26,16 @@ RUN chmod 644 /etc/ssl/certs/ccarrace.crt \
 # Copy our custom nginx configuration
 COPY ./conf/nginx.conf /etc/nginx/nginx.conf
 
-# Start nginx (in foreground mode!)
-CMD ["nginx", "-g", "daemon off;"]
+# Copy our initialization script (will delay Nginx start til PHP-FPM is listening)
+COPY ./tools/init.sh /usr/local/bin/init.sh
+RUN chmod +x /usr/local/bin/init.sh
+
+EXPOSE 443
+
+# Start nginx (in foreground mode!) -> Moved to tools/init.sh, to delay the start
+# until PHP-FPM is listening
+# CMD ["nginx", "-g", "daemon off;"]
+ENTRYPOINT ["bash", "/usr/local/bin/init.sh"]
 
 
 # [1] We install Nginx, and the OpenSSL tools needed to generate the certificates
