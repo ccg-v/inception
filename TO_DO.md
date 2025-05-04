@@ -1,4 +1,8 @@
-admin password: adminpass
+WordPress website (for logging into WordPress)
+ - site title:	my42inception
+ - username:	admin
+ - password:	adminpass
+ - e-mail:		admin@my42inception.com
 
 Check bookmarks!!!
 

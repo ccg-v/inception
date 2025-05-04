@@ -14,12 +14,12 @@ fi
 
 
 ### Wait for MySQL/MariaDB to be ready
-until mysql -u root -p"${MYSQL_ROOT_PASSWORD}" -e "SHOW DATABASES;" > /dev/null 2>&1; do
-	echo "Waiting for MariaDB to be ready..."
-	sleep 5
-done
+###until mysql -u root -p"${MYSQL_ROOT_PASSWORD}" -e "SHOW DATABASES;" > /dev/null 2>&1; do
+###	echo "Waiting for MariaDB to be ready..."
+###	sleep 5
+###done
 ### Create WordPress database if not already created
-mysql -u root -p"${MYSQL_ROOT_PASSWORD}" -e "CREATE DATABASE IF NOT EXISTS ${MYSQL_DATABASE};"
+###mysql -u root -p"${MYSQL_ROOT_PASSWORD}" -e "CREATE DATABASE IF NOT EXISTS ${MYSQL_DATABASE};"
 
 
 # Copy sample config
@@ -33,7 +33,7 @@ sed -i "s/localhost/${WORDPRESS_DB_HOST}/" /var/www/html/wp-config.php
 
 
 ### Export the database once WordPress is set up
-mysqldump -u root -p"${MYSQL_ROOT_PASSWORD}" ${MYSQL_DATABASE} > /var/www/html/dump.sql
+###mysqldump -u root -p"${MYSQL_ROOT_PASSWORD}" ${MYSQL_DATABASE} > /var/www/html/dump.sql
 
 
 # Start php-fpm in the foreground

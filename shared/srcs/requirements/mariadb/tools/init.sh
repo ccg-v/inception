@@ -25,12 +25,12 @@ FLUSH PRIVILEGES;
 EOF
 
 # Load our dump.sql file to bypass wordpress `wp-admin/install.php` page
-if [ -f "/usr/local/bin/dump.sql" ]; then
-    echo "Importing dump.sql..."
+#if [ -f "/usr/local/bin/dump.sql" ]; then
+#    echo "Importing dump.sql..."
 	mariadb -u root -p"$MYSQL_ROOT_PASSWORD" "${MYSQL_DATABASE}" < /usr/local/bin/dump.sql
-else
-    echo "dump.sql not found!"
-fi
+#else
+#    echo "dump.sql not found!"
+#fi
 
 # Stop temporary MariaDB instance [4]
 mysqladmin -u root -p"$MYSQL_ROOT_PASSWORD" shutdown

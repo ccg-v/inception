@@ -1,0 +1,6 @@
+USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+root           1  0.0  0.5 194088 20960 ?        Ss   20:11   0:00 php-fpm: master process (/etc/php/7.4/fpm/php-fpm.conf)
+www-data      19  0.1  0.9 196952 37972 ?        S    20:11   0:00 php-fpm: pool www
+www-data      20  0.0  0.1 194088  7360 ?        S    20:11   0:00 php-fpm: pool www
+root          21  0.2  0.0   4028  3260 pts/0    Ss   20:16   0:00 bash
+root          28  0.0  0.0   6756  2844 pts/0    R+   20:16   0:00 ps aux
