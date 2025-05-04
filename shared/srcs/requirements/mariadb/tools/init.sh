@@ -24,6 +24,14 @@ ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
 FLUSH PRIVILEGES;
 EOF
 
+# Load our dump.sql file to bypass wordpress `wp-admin/install.php` page
+if [ -f "/usr/local/bin/dump.sql" ]; then
+    echo "Importing dump.sql..."
+	mariadb -u root -p"$MYSQL_ROOT_PASSWORD" "${MYSQL_DATABASE}" < /usr/local/bin/dump.sql
+else
+    echo "dump.sql not found!"
+fi
+
 # Stop temporary MariaDB instance [4]
 mysqladmin -u root -p"$MYSQL_ROOT_PASSWORD" shutdown
 
@@ -36,11 +44,13 @@ exec mysqld_safe
 #		setting permissions and environment variables properly.
 #		`&` is used to run in the background, so the script can continue
 #		running while MariaDB boots up.
+#
 # ------------------------------------------------------------------------------
 # [2] `mariadb-admin`` is a command-line tool that talks to the MariaDB server
 #		and lets you manage it.  We use it here to ping to server and check if
 #		it is alive and ccepting connections. Until MariaDB is ready we pause 
 #		the script and delay the execution of the forthcoming SQL commands
+#
 # ------------------------------------------------------------------------------
 # [3] We cannot write SQL commands directly in the script:
 #			CREATE DATABASE IF NOT EXISTS $MYSQL_DATABASE
@@ -65,8 +75,19 @@ exec mysqld_safe
 #		- we want clean formatting and less repetition
 #		- we want to execute many statements at once
 #		- we want to avoid spawning multiple connections (one per `-e`)
+#
 # ------------------------------------------------------------------------------
 # [4] `mmysql_admin` is another admin tool (like `mariadb-admin`) that comes from
 #		the MySQL legacy tools. It allows us to gracefully stop the MariaDB server.
 #		Here we have to provide the root password because it has already been set 
 #		in the last SQL statement.
+#
+# ------------------------------------------------------------------------------
+# [5] The `dump.sql` file pre-populates the MariaDB database with the minimal
+#		tables/data Wordpress needs to recognize the site as already installed.
+#		- It creates the essential tables (`wp_options`, `wp_users`, etc.).
+#		- It inserts the site URL, admin user, and other defaults
+#		- It mimics what `wp-admin/install.php` would do during setup.
+#		It is useful to bypass the WordPress installation page (`install.php`).
+#		WordPress sees the expected database content and boots straight to the
+#		login screen or homepage, depending on the setup.

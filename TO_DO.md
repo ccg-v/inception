@@ -1,3 +1,5 @@
+admin password: adminpass
+
 Check bookmarks!!!
 
 # docker-compose
@@ -28,3 +30,8 @@ Pending:
 hostname:
 - store in an env variable?
 - or modify /hosts?
+
+Secrets?
+
+Document hash creation, wp-cli installation, as part of dump.sql
+ - what is dump.sql for
