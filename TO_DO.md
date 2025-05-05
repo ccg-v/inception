@@ -35,7 +35,13 @@ hostname:
 - store in an env variable?
 - or modify /hosts?
 
+remove exposed ports from MDB and WP Dockerfiles
+
 Secrets?
 
 Document hash creation, wp-cli installation, as part of dump.sql
  - what is dump.sql for
+
+NO APARECEN LOS COMENTARIOS
+SEGUNDO USUARIO?
+POR QUE EMPIEZO DE CERO Y EN EL BLOG HAY PARTES PERSONALIZADAS?

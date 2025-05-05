@@ -1,0 +1,60 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    Makefile                                           :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2025/05/05 19:41:07 by ccarrace          #+#    #+#              #
+#    Updated: 2025/05/06 01:33:05 by ccarrace         ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
+DOMAIN			= ccarrace.42.fr
+COMPOSE			= docker compose
+COMPOSE_FILE	= srcs/docker-compose.yml
+
+all: set_host build-up
+
+set_host:
+	@if ! grep -q "${DOMAIN}" /etc/hosts; then \
+		sudo sed -i "/^127.0.0.1/s/$$/ ${DOMAIN}/" /etc/hosts; \
+	fi
+
+unset_host:
+	@sudo sed -i "s/ ${DOMAIN}//g" /etc/hosts
+
+skip_host:
+	@echo "Skipping domain injection. Make sure ${DOMAIN} resolves to 127.0.0.1"
+	$(MAKE) build-up
+
+build:
+	$(COMPOSE) -f $(COMPOSE_FILE) build
+
+up:
+	$(COMPOSE) -f $(COMPOSE_FILE) up -d
+
+build-up:
+	$(COMPOSE) -f $(COMPOSE_FILE) up --build -d
+
+down:
+	$(COMPOSE) -f $(COMPOSE_FILE) down
+
+start:
+	$(COMPOSE) -f $(COMPOSE_FILE) start
+
+stop:
+	$(COMPOSE) -f $(COMPOSE_FILE) stop
+
+restart: stop start
+
+clean:
+	$(COMPOSE) -f $(COMPOSE_FILE) down --volumes --remove-orphans
+
+fclean: clean
+	$(COMPOSE) -f $(COMPOSE_FILE) down --rmi all
+	$(MAKE) unset_host
+
+re: fclean all
+
+.PHONY: all build up down start stop restart clean fclean re
