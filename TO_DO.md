@@ -42,6 +42,11 @@ Secrets?
 Document hash creation, wp-cli installation, as part of dump.sql
  - what is dump.sql for
 
+Set certificate paths/names in .env and replace them in nginx.conf
+
+Am I hardcoding the env variables somewhere? It worked when I had wrong syntax in .env file, so I was
+presumibly passing the values somehow...
+
 NO APARECEN LOS COMENTARIOS
 SEGUNDO USUARIO?
 POR QUE EMPIEZO DE CERO Y EN EL BLOG HAY PARTES PERSONALIZADAS?

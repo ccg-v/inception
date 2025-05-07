@@ -4,7 +4,12 @@ services:
     image: mariadb:inception # image tagging
     build:
       context: ./requirements/mariadb
-    env_file: .env
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - WORDPRESS_DB_HOST=${WORDPRESS_DB_HOST}
     volumes:
       - mariadb_data:/var/lib/mysql
     networks:
@@ -16,7 +21,19 @@ services:
     image: wordpress:inception
     build:
       context: ./requirements/wordpress
-    env_file: .env
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - WORDPRESS_DB_HOST=${WORDPRESS_DB_HOST}
+      - DOMAIN_NAME=${DOMAIN_NAME}
+      - WP_ADMIN_USER=${WP_ADMIN_USER}
+      - WP_ADMIN_PASS=${WP_ADMIN_PASS}
+      - WP_ADMIN_EMAIL=${WP_ADMIN_EMAIL}
+      - WP_SECOND_USER=${WP_SECOND_USER}
+      - WP_SECOND_PASS=${WP_SECOND_PASS}
+      - WP_SECOND_EMAIL=${WP_SECOND_EMAIL}
     depends_on:
       - mariadb
     volumes:

@@ -17,8 +17,7 @@ COPY ./tools/init.sh /usr/local/bin/init.sh
 RUN chmod +x /usr/local/bin/init.sh
 
 # Copy dump file to bypass the Wordpress installation page [1]
-COPY ./config/dump.sql /usr/local/bin/
-#COPY ./config/dump.sql /docker-entrypoint-initdb.d/
+#COPY ./config/dump.sql /usr/local/bin/
 
 COPY ./config/custom.cnf /etc/mysql/mariadb.conf.d/
 RUN chmod 644 /etc/mysql/mariadb.conf.d/custom.cnf

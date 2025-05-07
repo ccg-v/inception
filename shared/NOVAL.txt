@@ -1,0 +1,17 @@
+/mnt/shared/srcs$ docker compose config | grep MYSQL
+      MYSQL_DATABASE: wordpress
+      MYSQL_PASSWORD: wppass
+      MYSQL_ROOT_PASSWORD: rtpass
+      MYSQL_USER: wpuser
+      MYSQL_DATABASE: wordpress
+      MYSQL_PASSWORD: wppass
+      MYSQL_ROOT_PASSWORD: rtpass
+      MYSQL_USER: wpuser
+      MYSQL_DATABASE: wordpress
+      MYSQL_PASSWORD: wppass
+      MYSQL_ROOT_PASSWORD: rtpass
+      MYSQL_USER: wpuser
+
+
+
+

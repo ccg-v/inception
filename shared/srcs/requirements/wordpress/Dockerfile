@@ -5,6 +5,11 @@ RUN apt-get update -y \
 	&& apt-get install -y php7.4 php7.4-mysql php7.4-fpm curl tar mariadb-client\
 	&& apt-get clean
 
+# Install WP-CLI (this installs `wp` globally as `/usr/local/bin/wp`)
+RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \
+    chmod +x wp-cli.phar && \
+    mv wp-cli.phar /usr/local/bin/wp
+
 # Create directory for PHP-FPM socket
 RUN mkdir -p /run/php
 
