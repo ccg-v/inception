@@ -1,17 +1,12 @@
-/mnt/shared/srcs$ docker compose config | grep MYSQL
-      MYSQL_DATABASE: wordpress
-      MYSQL_PASSWORD: wppass
-      MYSQL_ROOT_PASSWORD: rtpass
-      MYSQL_USER: wpuser
-      MYSQL_DATABASE: wordpress
-      MYSQL_PASSWORD: wppass
-      MYSQL_ROOT_PASSWORD: rtpass
-      MYSQL_USER: wpuser
-      MYSQL_DATABASE: wordpress
-      MYSQL_PASSWORD: wppass
-      MYSQL_ROOT_PASSWORD: rtpass
-      MYSQL_USER: wpuser
-
-
-
-
+Running init.sh...
+Starting MariaDB...
+250508 01:04:35 mysqld_safe Logging to syslog.
+250508 01:04:35 mysqld_safe Starting mariadbd daemon with databases from /var/lib/mysql
+MariaDB is ready, continuing setup...
+ERROR 2002 (HY000): Can't connect to local MySQL server through socket '/run/mysqld/mysqld.sock' (2)
+mysqladmin: connect to server at 'localhost' failed
+error: 'Can't connect to local MySQL server through socket '/run/mysqld/mysqld.sock' (2)'
+Check that mysqld is running and that the socket: '/run/mysqld/mysqld.sock' exists!
+250508 01:04:37 mysqld_safe Logging to syslog.
+250508 01:04:37 mysqld_safe Starting mariadbd daemon with databases from /var/lib/mysql
+Running init.sh...

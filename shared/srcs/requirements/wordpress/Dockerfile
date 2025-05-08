@@ -65,6 +65,7 @@ CMD ["bash", "/usr/local/bin/setup.sh"]
 #      curl -O https://wordpress.org/latest.tar.gz
 # -O = save the file with the same name it has in the URL (latest.tar.gz).
 # ------------------------------------------------------------------------------
+#
 # PHP is a programming language, mainly used for server-side web development.
 #
 # 	- `php7.4`
@@ -98,13 +99,14 @@ CMD ["bash", "/usr/local/bin/setup.sh"]
 #	files (like .html, .jpg, .css).
 # 	When NGINX sees a request for a .php file (like index.php in WordPress), it 
 #	forwards that request to PHP-FPM.
-# 	PHP-FPM reads the PHP code, runs it, and returns the generated HTML to NGINX.
+# 	PHP-FPM reads the PHP code, runs it and returns the generated HTML to NGINX.
 # 	Then NGINX sends the final HTML to the user's browser.
 # 	Without PHP-FPM:
 # 		- NGINX would download the .php files as if they were static files (like 
 #			downloading a .txt file).
 # 		- NO execution of PHP would happen.
 # 	Without NGINX:
-# 		- PHP-FPM alone wouldn't know how to "talk to the outside world" (it just
-#			listens internally).
-# 		- You would have no web access unless you manually configured something crazy.
+# 		- PHP-FPM alone wouldn't know how to "talk to the outside world" (it 
+#			just listens internally).
+# 		- You would have no web access unless you manually configured something
+#			crazy.

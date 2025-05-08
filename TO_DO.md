@@ -1,3 +1,5 @@
+bash -c "docker stop $(docker ps -qa); docker rm $(docker ps -qa); docker rmi $(docker images -qa); docker volume rm $(docker volume ls -q); docker network rm $(docker network ls -q) 2>/dev/null"
+
 WordPress website (for logging into WordPress)
  - site title:	my42inception
  - username:	admin
@@ -19,7 +21,6 @@ service:
 - network?
 - volumes: Set name? External? Driver?
 
-
 # MariaDB:
 
 Xplanations:
@@ -37,15 +38,16 @@ hostname:
 
 remove exposed ports from MDB and WP Dockerfiles
 
-Secrets?
+Secrets? Ignore .env?
 
 Document hash creation, wp-cli installation, as part of dump.sql
  - what is dump.sql for
 
 Set certificate paths/names in .env and replace them in nginx.conf
 
-Am I hardcoding the env variables somewhere? It worked when I had wrong syntax in .env file, so I was
-presumibly passing the values somehow...
+Am I hardcoding the env variables somewhere? It worked when I had wrong syntax in .env file,so I was presumibly passing the values somehow...
+
+Warning in wordpress logs about root user -> normal?
 
 NO APARECEN LOS COMENTARIOS
 SEGUNDO USUARIO?
