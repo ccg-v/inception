@@ -8,10 +8,10 @@ echo "Starting MariaDB..."
 sleep 2
 
 # Wait until MariaDB is ready [2]
-until mariadb-admin ping --silent; do
-    echo "Waiting for MariaDB to be ready..."
-    sleep 1
-done
+#until mariadb-admin ping --silent; do
+#    echo "Waiting for MariaDB to be ready..."
+#    sleep 1
+#done
 
 echo "MariaDB is ready, continuing setup..."
 

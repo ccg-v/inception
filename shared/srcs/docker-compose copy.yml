@@ -10,11 +10,8 @@ services:
       - MYSQL_USER=${MYSQL_USER}
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
       - WORDPRESS_DB_HOST=${WORDPRESS_DB_HOST}
-#    volumes:
-#      - mariadb_data:/var/lib/mysql
-#    volumes:
-#      - "/home/ccarrace/data/mariadb:/var/lib/mysql"
-    volumes: [mariadb_data:/var/lib/mysql]
+    volumes:
+      - mariadb_data:/var/lib/mysql
     networks:
       - inception
     restart: unless-stopped
@@ -39,11 +36,8 @@ services:
       - WP_SECOND_EMAIL=${WP_SECOND_EMAIL}
     depends_on:
       - mariadb
-#    volumes:
-#      - wordpress_data:/var/www/html
-#    volumes:
-#      - "/home/ccarrace/data/wordpress:/var/www/html"
-    volumes: [wordpress_data:/var/www/html]
+    volumes:
+      - wordpress_data:/var/www/html
     networks:
       - inception
     restart: unless-stopped
@@ -56,37 +50,19 @@ services:
     env_file: .env
     depends_on:
       - wordpress
-#    volumes:
-#      - wordpress_data:/var/www/html:ro # [1]
-#    volumes:
-#      - "/home/ccarrace/data/wordpress:/var/www/html:ro" # [1]
-    volumes: [wordpress_data:/var/www/html]
+    volumes:
+      - wordpress_data:/var/www/html:ro # [1] 
     ports:
       - "443:443" # [2]
     networks:
       - inception
     restart: unless-stopped
 
-#volumes:
-#  mariadb_data:
-#    name: mariadb_data
-#  wordpress_data:
-#    name: wordpress_data
-
 volumes:
-  wordpress_data:
-    driver: local
-    driver_opts:
-      type: none
-      device: /home/ccarrace/data/wordpress
-      o: bind
-
   mariadb_data:
-    driver: local
-    driver_opts:
-      type: none
-      device: /home/ccarrace/data/mariadb
-      o: bind
+    name: mariadb_data
+  wordpress_data:
+    name: wordpress_data
 
 networks:
   inception:
