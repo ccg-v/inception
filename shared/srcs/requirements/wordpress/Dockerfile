@@ -1,9 +1,9 @@
 FROM debian:bullseye
 
-# Install dependencies
-RUN apt-get update -y \
-	&& apt-get install -y php7.4 php7.4-mysql php7.4-fpm curl tar mariadb-client\
-	&& apt-get clean
+# Update and install dependencies [1][2][3]
+RUN apt-get update -y && \
+	apt-get install -y php7.4 php7.4-mysql php7.4-fpm curl tar mariadb-client && \
+	apt-get clean
 
 # Install WP-CLI (this installs `wp` globally as `/usr/local/bin/wp`)
 RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \
@@ -14,59 +14,55 @@ RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli
 RUN mkdir -p /run/php
 
 # Downloading and installing WordPress not to be done here, during image building,
-# but when running the script to start the container
+# but later during execution of the script that configures/starts the container.
 
-# Override the default 'www.conf' with our custom version that includes essential
-# directives for a WordPress + Nginx setup (with PHP-FPM over TCP)
+# Override the default 'www.conf' with our custom version
 COPY ./conf/www.conf /etc/php/7.4/fpm/pool.d/www.conf
 
-# WordPress needs a wp-config.php with your DB credentials, which it doesn't generate on its own without a browser UI.
-# We can generate it at runtime using a script
+# Copy the setup script and change permissions [3]
 COPY tools/setup.sh /usr/local/bin/setup.sh
 RUN chmod +x /usr/local/bin/setup.sh
-#RUN bash /usr/local/bin/setup.sh
 
 # Set working directory
 WORKDIR /var/www/html
 
+# We don't need to expose port 9000 but I keep it for documentation purposes [4]
 EXPOSE 9000
 
-# Start php-fpm in the foreground --> moved to the wordpress script in wordpress/tools/setup.sh
-# If we run the script during 'RUN bash /usr/local/bin/setup.sh', the wp-config.php file will be 
-# created with all our environment variables because the container hasn't started yet and those 
-# variables haven't been injected so they are not available.
-# Remember: Environment variables from .env file or docker-compose.yml only exist at RUNTIME, not
-# build time. Runtime is what happens when the container starts, and container starts when you 
-# launch the container with either CMD or ENTRYPOINT
-#CMD ["php-fpm7.4", "-F"]
+# Run the setup script
 CMD ["bash", "/usr/local/bin/setup.sh"] 
 
 # ------------------------------------------------------------------------------
-# `curl`
 #
-# It's a command-line tool to download files from URLs (HTTP, HTTPS, FTP, etc.). 
-# We need it to fetch the WordPress files during the image build.
-# Without `curl` we would have to manually download WordPress ourselves and copy 
-# it into the container using `COPY`, which would be annoying and less dynamic.
-# `curl` ensures our image always grabs the latest WordPress version when we 
-# build it.
+# [1]`curl`
 #
-# curl URL → Make an HTTP request (default: GET) and print the response.
-# Downloading a file (like we did in the Dockerfile) is just a special case of 
-# that, the server responds with a file content instead of an HTML page.
-# We are not downloading a file when we curl localhost:9000. We are making a 
-# network request, and whatever is at the other end responds (if it can).
-# In our case, php-fpm doesn't directly serve HTTP responses to browsers — it
-# speaks FastCGI protocol, not HTTP. That's why curl localhost:9000 doesn't  
-# "work" normally for PHP-FPM: php-fpm expects a FastCGI client, not a curl HTTP
-# client.
+# 	It's a command-line tool to download files from URLs (HTTP, HTTPS, FTP,...). 
+# 	We need it to fetch the WordPress files during the image build.
+# 	Without `curl` we would have to manually download WordPress ourselves and
+# 	copy it into the container using `COPY`, which would be annoying and less
+#	dynamic.
+# 	`curl` ensures our image always grabs the latest WordPress version when we 
+# 	build it.
+#
+# 	curl URL: Make an HTTP request (default: GET) and print the response.
+# 	Downloading a file (like we did in the Dockerfile) is just a special case
+# 	of that, the server responds with a file content instead of an HTML page.
+# 	We are not downloading a file when we `curl localhost:9000`. We are making
+# 	a network request, and whatever is at the other end responds (if it can).
+# 	In our case, php-fpm doesn't directly serve HTTP responses to browsers, it
+# 	speaks FastCGI protocol, not HTTP. That's why curl localhost:9000 doesn't  
+# 	"work" normally for PHP-FPM: php-fpm expects a FastCGI client, not a curl
+# 	HTTP client.
 # 
-# Needs an extra flag to save a file (-O to save with the original filename).
+# 	Needs an extra flag to save a file (-O to save with the original filename).
 #      curl -O https://wordpress.org/latest.tar.gz
-# -O = save the file with the same name it has in the URL (latest.tar.gz).
+# 	-O = save the file with the same name it has in the URL (latest.tar.gz)
+#
 # ------------------------------------------------------------------------------
 #
-# PHP is a programming language, mainly used for server-side web development.
+# [2] PHP
+#
+#	It is a programming language, mainly used for server-side web development.
 #
 # 	- `php7.4`
 #
@@ -110,3 +106,35 @@ CMD ["bash", "/usr/local/bin/setup.sh"]
 #			just listens internally).
 # 		- You would have no web access unless you manually configured something
 #			crazy.
+#
+# ------------------------------------------------------------------------------
+#
+# [3] `wp-config.php`
+#
+#	WordPress needs a wp-config.php with our DB credentials. Users normally 
+#	providedata via browser UI during Wordpress manual installation, and the file
+#	is automatically generated.
+#	But since we must do the whole process programatically we generate the file
+#	AT RUNTIME (in the CMD command) using a script where we inject our values to
+#   the `wp-config.php` file using the WP_CLI tools that we have just installed.
+#
+#	Running the script in the Dockerfile with 'RUN bash /usr/local/bin/setup.sh'
+#	will not work because the container hasn't started yet. Remember:
+#
+#	- Environment variables from .env file or docker-compose.yml only exist at 
+#		RUNTIME, not build time.
+#	- Runtime is what happens when the container starts, and container starts
+#		when you launch the container with either CMD or ENTRYPOINT
+#
+# ------------------------------------------------------------------------------
+#
+# [4] EXPOSE
+#
+#	In our project port 9000 is going to be reachable only internally in the
+#	Docker network by NGINX, o there is no need to EXPOSE it to the host or the
+#	internet. Under no circumstances EXPOSE makes the port accessible outside
+#	the container, it is the 'ports' directive in 'docker-compose.yml' or the 
+# 	'RUN' command in the Dockerfile that actually opens the port to the host and 
+#	can create a security risk if misused. EXPOSE is totally safe, it's only 
+#	metadata signaling that MariaDB listens on 3306 but it doesn't open the port.
+

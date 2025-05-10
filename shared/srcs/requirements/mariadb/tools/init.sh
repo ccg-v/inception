@@ -39,7 +39,7 @@ mysqladmin -u root -p"$MYSQL_ROOT_PASSWORD" shutdown
 exec mysqld_safe 
 
 
-# [1] `mysql_safe` is a wrapper script aroud the mysqld server. It adds extra
+# [1] `mysql_safe` is a wrapper script around the mysqld server. It adds extra
 #		safety features like logging, restarting mysqld if it crashes and
 #		setting permissions and environment variables properly.
 #		`&` is used to run in the background, so the script can continue
@@ -48,8 +48,8 @@ exec mysqld_safe
 # ------------------------------------------------------------------------------
 # [2] `mariadb-admin`` is a command-line tool that talks to the MariaDB server
 #		and lets you manage it.  We use it here to ping to server and check if
-#		it is alive and ccepting connections. Until MariaDB is ready we pause 
-#		the script and delay the execution of the forthcoming SQL commands
+#		it is alive and accepting connections. Until MariaDB is ready we pause 
+#		the script and delay the execution of the forthcoming SQL commands.
 #
 # ------------------------------------------------------------------------------
 # [3] We cannot write SQL commands directly in the script:

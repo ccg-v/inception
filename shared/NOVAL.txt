@@ -1,20 +1,4 @@
-[
-    {
-        "CreatedAt": "2025-05-09T01:19:54+02:00",
-        "Driver": "local",
-        "Labels": {
-            "com.docker.compose.config-hash": "a57b43400a88b5867e3919e88b5f52ace79914f0d5dfb014b28349aff14451f3",
-            "com.docker.compose.project": "srcs",
-            "com.docker.compose.version": "2.35.1",
-            "com.docker.compose.volume": "mariadb_data"
-        },
-        "Mountpoint": "/var/lib/docker/volumes/srcs_mariadb_data/_data",
-        "Name": "srcs_mariadb_data",
-        "Options": {
-            "device": "/home/ccarrace/data/mariadb",
-            "o": "bind",
-            "type": "none"
-        },
-        "Scope": "local"
-    }
-]
+[09-May-2025 23:45:00] ERROR: [/etc/php/7.4/fpm/pool.d/www.conf:1] value is NULL for a ZEND_INI_PARSER_ENTRY
+[09-May-2025 23:45:00] ERROR: Unable to include /etc/php/7.4/fpm/pool.d/www.conf from /etc/php/7.4/fpm/php-fpm.conf at line 1
+[09-May-2025 23:45:00] ERROR: failed to load configuration file '/etc/php/7.4/fpm/php-fpm.conf'
+[09-May-2025 23:45:00] ERROR: FPM initialization failed
