@@ -1,0 +1,17 @@
+[mysqld]
+default_authentication_plugin = mysql_native_password
+bind-address = 0.0.0.0
+skip-name-resolve
+
+# bind-address = 0.0.0.0
+# 
+# It tells MariaDB to listen on all available network interfaces, i.e., accept
+# connections from anywhere, including Docker's internal bridge network, and 
+# not just localhost.
+# WordPress container connects to MariaDB via the container network (e.g., to 
+# the hostname mariadb). If we don’t set `bind-address = 0.0.0.0`, MariaDB
+# might default to 127.0.0.1, which allows only local connections (inside the
+# container itself), and our WordPress container would get:
+#		ERROR 2002 (HY000): Can't connect to MySQL server
+# So `bind-address = 0.0.0.0` is essential for inter-container communication in 
+# Docker, unless MariaDB is already set to bind externally by default.

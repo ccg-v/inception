@@ -1,0 +1,19 @@
+[09-May-2025 23:45:00] ERROR: [/etc/php/7.4/fpm/pool.d/www.conf:1] value is NULL for a ZEND_INI_PARSER_ENTRY
+[09-May-2025 23:45:00] ERROR: Unable to include /etc/php/7.4/fpm/pool.d/www.conf from /etc/php/7.4/fpm/php-fpm.conf at line 1
+[09-May-2025 23:45:00] ERROR: failed to load configuration file '/etc/php/7.4/fpm/php-fpm.conf'
+[09-May-2025 23:45:00] ERROR: FPM initialization failed
+MariaDB is ready, continuing setup...
+Enter password: ERROR 1045 (28000): Access denied for user 'root'@'localhost' (using password: YES)
+Enter password: mysqladmin: connect to server at 'localhost' failed
+error: 'Access denied for user 'root'@'localhost' (using password: NO)'
+250510 04:38:20 mysqld_safe Logging to syslog.
+250510 04:38:20 mysqld_safe A mysqld process already exists
+Error: Error establishing a database connection. This either means that the username and password information in your `wp-config.php` file is incorrect or that contact with the database server at `mariadb:3306` could not be established. This could mean your host’s database server is down.
+/usr/local/bin/setup.sh: line 51: /run/secrets/wp_admin_password: No such file or directory
+
+
+Enter password: ERROR 1045 (28000): Access denied for user 'root'@'localhost' (using password: YES)
+Enter password: mysqladmin: connect to server at 'localhost' failed
+error: 'Access denied for user 'root'@'localhost' (using password: NO)'
+250510 20:24:22 mysqld_safe Logging to syslog.
+250510 20:24:22 mysqld_safe A mysqld process already exists

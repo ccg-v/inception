@@ -1,0 +1,7 @@
+services:
+  simple-web-service:
+    image: devopsdockeruh/simple-web-service
+    container_name: exercise-2.2
+    ports:
+      - 8080:8080
+    command: server

@@ -1,0 +1,133 @@
+services:
+  mariadb:
+    container_name: mariadb
+    image: mariadb:inception
+    build:
+      context: ./requirements/mariadb
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - WORDPRESS_DB_HOST=${WORDPRESS_DB_HOST}
+      - HOST_DATA_PATH=${HOST_DATA_PATH}
+    volumes:
+     - mariadb_data:/var/lib/mysql
+    networks:
+      - inceptioNet
+    restart: unless-stopped
+
+  wordpress:
+    container_name: wordpress
+    image: wordpress:inception
+    build:
+      context: ./requirements/wordpress
+    env_file: .env
+#    environment:
+#      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+#      - MYSQL_DATABASE=${MYSQL_DATABASE}
+#      - MYSQL_USER=${MYSQL_USER}
+#      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+#      - WORDPRESS_DB_HOST=${WORDPRESS_DB_HOST}
+#      - DOMAIN_NAME=${DOMAIN_NAME}
+#      - WP_ADMIN_USER=${WP_ADMIN_USER}
+#      - WP_ADMIN_PASS=${WP_ADMIN_PASS}
+#      - WP_ADMIN_EMAIL=${WP_ADMIN_EMAIL}
+#      - WP_SECOND_USER=${WP_SECOND_USER}
+#      - WP_SECOND_PASS=${WP_SECOND_PASS}
+#      - WP_SECOND_EMAIL=${WP_SECOND_EMAIL}
+    depends_on:
+      - mariadb
+    volumes: 
+      - wordpress_data:/var/www/html
+    networks:
+      - inceptioNet
+    restart: unless-stopped
+
+  nginx:
+    container_name: nginx
+    image: nginx:inception
+    build:
+      context: ./requirements/nginx
+    depends_on:
+      - wordpress
+    volumes:
+      - wordpress_data:/var/www/html:ro # [1]
+    ports:
+      - "443:443" # [2]
+    networks:
+      - inceptioNet
+    restart: unless-stopped
+
+# --- Volumes ---------------------------------------------------------------- #
+
+volumes:
+  wordpress_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${HOST_DATA_PATH}/wordpress
+      o: bind
+
+  mariadb_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${HOST_DATA_PATH}/mariadb
+      o: bind
+
+# --- Networks --------------------------------------------------------------- #
+
+networks:
+  inceptioNet:
+
+# [1] `:ro`
+#
+#     Read-only mode. We are telling Docker to mount this volume in the 
+#     container but disallow writing to it. It is a good practice because
+#     - Nginx is just serving static files, so it does not need to write
+#     - This prevents accidental or malicious changes to WordPres content
+#       from the Nginx container.
+#
+# ------------------------------------------------------------------------------
+#
+# [2] ports: "443:443"
+#
+#     This maps a container port to our host machine, making it externally
+#     accessible. NGINX is our public-facing entry point, thus it must be 
+#     reachable from outside the Docker network.
+#     We don't need to map ports for MariaDB and WordPress because these
+#     services are only accessed internally within the Docker network (that
+#     we called 'inception'). Docker Compose automatically exposes all 
+#     container ports to other containers on the same network, without ports:.
+#     Adding `EXPOSE <port_number>` to Wordpress or MariaDB Dockerfiles can be
+#     done but is purely declarative (a hint or documentation) but it does not
+#     expose a port to the host or affect container behaviour. Real exposure
+#     only happens when you define `ports:` in `docker-compose.yml` file.
+#     
+#     Services listen on their standard/default ports:
+#       - MariaDB listens by default on port 3306
+#       - PHP-FPM (used by WordPress) listens by default on port 9000 (if
+#         configured that way)
+#
+#     Docker Compose networking handles DNS resolution:
+#       - Each service is accessible from others by its service name 
+#       - You don't need to know the IP, Docker does the internal DNS routing
+#
+#     So how do they "know" where to connect?
+#       - NGINX <--> WordPress:
+#           In `nginx.conf`, we specify:
+#               `fastcgi_pass wordpress:9000;`
+#           That tells NGINX:
+#             “Send PHP requests to a service named wordpress, port 9000.”
+#           Since wordpress is the Docker Compose service name, and the container 
+#           is listening on 9000, this works smoothly.
+#
+#       -  WordPress <--> MariaDB:
+#           In the `.env` file, we define a variable:
+#             `WORDPRESS_DB_HOST=mariadb:3306`
+#           In the WordPress setup script we inject the value from `.env` into
+#           the real config (copied from a default template):
+#               `sed -i "s/localhost/${WORDPRESS_DB_HOST}/" /var/www/html/wp-config.php`
+#           Again, Docker resolves mariadb to the correct container, and MariaDB
+#           listens on 3306 by default.
