@@ -108,7 +108,7 @@ Binding to `0.0.0.0` means it listens on all interfaces (even public ones) unles
 
 ## 4. PHP-FPM Process Management
 
-This section controls how PHP-FPM spawns and manages worker processes (remember PHP is single-threaded, so each worker can only handle one request at a time -see [pool name](#https://github.com/ccg-v/inception/blob/main/DOCS/WORDPRESS_CONFIG.md#1-pool-name) section above).
+This section controls how PHP-FPM spawns and manages worker processes (remember PHP is single-threaded, so each worker can only handle one request at a time -see [pool name](#https://github.com/ccg-v/inception/blob/main/DOCS/WORDPRESS_CONFIG.md#1-pool-name) section above-).
 
 - `pm = dynamic`
 
