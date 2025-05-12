@@ -1,4 +1,0 @@
-[09-May-2025 23:45:00] ERROR: [/etc/php/7.4/fpm/pool.d/www.conf:1] value is NULL for a ZEND_INI_PARSER_ENTRY
-[09-May-2025 23:45:00] ERROR: Unable to include /etc/php/7.4/fpm/pool.d/www.conf from /etc/php/7.4/fpm/php-fpm.conf at line 1
-[09-May-2025 23:45:00] ERROR: failed to load configuration file '/etc/php/7.4/fpm/php-fpm.conf'
-[09-May-2025 23:45:00] ERROR: FPM initialization failed
