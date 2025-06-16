@@ -7,7 +7,7 @@ RUN apt install -y mariadb-server mariadb-client #
 # Create runtime directory MariaDB and set correct ownership
 RUN mkdir -p /var/lib/mysql /var/run/mysqld
 RUN chown -R mysql:mysql /var/lib/mysql /var/run/mysqld
-RUN chmod 777 /var/run/mysqld
+RUN chmod 755 /var/run/mysqld
 
 # Custom script and config file to initialize DB/user
 COPY ./tools/init.sh /usr/local/bin/init.sh
